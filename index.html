@@ -229,9 +229,10 @@ th{color:var(--ink-soft); font-weight:700; font-size:11.5px; text-transform:uppe
 .msg{max-width:75%; padding:9px 13px; border-radius:16px; font-size:13.5px; line-height:1.4;}
 .msg.me{align-self:flex-end; background:var(--vino); color:var(--blanco); border-bottom-right-radius:4px;}
 .msg.them{align-self:flex-start; background:var(--blanco); border:1px solid var(--line); border-bottom-left-radius:4px;}
+.msg-sender{display:block; font-weight:700; font-size:11.5px; color:var(--oceano); margin-bottom:3px;}
 .msg .t{font-size:10px; opacity:.65; margin-top:3px; display:block;}
 .chat-input{display:flex; gap:8px; padding:10px; background:var(--blanco); border-top:1px solid var(--line);}
-.chat-input input{flex:1; border:1.5px solid var(--line); border-radius:20px; padding:10px 16px; font-size:13.5px;}
+.chat-input textarea{flex:1; border:1.5px solid var(--line); border-radius:20px; padding:10px 16px; font-size:13.5px; font-family:inherit; resize:none; max-height:120px; overflow-y:auto; line-height:1.4;}
 .chat-input button{width:40px; height:40px; border-radius:50%; border:none; background:var(--vino); color:var(--blanco); font-size:16px;}
 
 .tag-lock{display:inline-flex; align-items:center; gap:4px; font-size:11px; color:var(--ink-soft);}
@@ -266,17 +267,19 @@ th{color:var(--ink-soft); font-weight:700; font-size:11.5px; text-transform:uppe
       </div>
     </div>
 
-    <div class="field">
-      <label>Usuario o correo electrónico</label>
-      <input type="text" id="loginIdentifier" placeholder="usuario o correo@ejemplo.com">
-      <p id="loginHint" style="font-size:11px; color:var(--ink-soft); margin:6px 2px 0;"></p>
+    <div id="loginCredentials" style="display:none;">
+      <div class="field">
+        <label>Usuario o correo electrónico</label>
+        <input type="text" id="loginIdentifier" placeholder="usuario o correo@ejemplo.com">
+        <p id="loginHint" style="font-size:11px; color:var(--ink-soft); margin:6px 2px 0;"></p>
+      </div>
+      <div class="field">
+        <label>Contraseña</label>
+        <input type="password" id="passInput" placeholder="••••">
+      </div>
+      <div class="err" id="loginErr"></div>
+      <button class="btn-primary" id="loginBtn">Ingresar</button>
     </div>
-    <div class="field">
-      <label>Contraseña</label>
-      <input type="password" id="passInput" placeholder="••••">
-    </div>
-    <div class="err" id="loginErr"></div>
-    <button class="btn-primary" id="loginBtn">Ingresar</button>
     <button class="link-btn" id="createUserLink">+ Crear nuevo usuario</button>
   </div>
 </div>
@@ -434,7 +437,8 @@ const state = {
       {from:'me', text:'¡Claro! Ya la tengo lista 🎹', t:'10:05'}
     ],
     cuerda: [
-      {from:'them', text:'¿Confirmáis asistencia al ensayo del sábado?', t:'09:14'},
+      {from:'them', name:'Laura Sánchez', text:'¿Confirmáis asistencia al ensayo del sábado?', t:'09:14'},
+      {from:'them', name:'Javier Ortuño', text:'Yo llego un poco tarde, aviso al llegar.', t:'09:16'},
       {from:'me', text:'Yo sí, allí estaré.', t:'09:20'}
     ]
   }
@@ -460,6 +464,24 @@ function openModal(html){
 function closeModal(){ document.getElementById('modalBg').classList.remove('show'); }
 document.getElementById('modalBg').addEventListener('click', e=>{ if(e.target.id==='modalBg') closeModal(); });
 
+/* Enter para validar: en modales activa el botón principal (.btn-primary);
+   en la pantalla de inicio activa "Ingresar". No afecta a los textarea (para permitir saltos de línea). */
+document.addEventListener('keydown', (e)=>{
+  if(e.key !== 'Enter') return;
+  if(e.target.tagName === 'TEXTAREA') return;
+  const modalBody = document.getElementById('modalBody');
+  if(modalBody && modalBody.contains(e.target)){
+    const btn = modalBody.querySelector('.btn-primary');
+    if(btn){ e.preventDefault(); btn.click(); }
+    return;
+  }
+  const loginScreen = document.getElementById('login-screen');
+  if(loginScreen && loginScreen.contains(e.target) && (e.target.tagName==='INPUT' || e.target.tagName==='SELECT')){
+    e.preventDefault();
+    document.getElementById('loginBtn').click();
+  }
+});
+
 function initials(name){ return name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase(); }
 
 /* =========================================================================
@@ -474,6 +496,7 @@ document.getElementById('roleGrid').addEventListener('click', e=>{
   document.querySelectorAll('.role-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   selectedRole = btn.dataset.role;
+  document.getElementById('loginCredentials').style.display = 'block';
   mostrarPistaLogin();
 });
 
@@ -508,18 +531,34 @@ document.getElementById('loginBtn').addEventListener('click', ()=>{
 });
 
 document.getElementById('createUserLink').addEventListener('click', ()=>{
+  const cuerdasDisponibles = state.cuerdas.filter(c=>c!=='Viento Madera' && c!=='Viento Metal');
   openModal(`
     <h3>Crear nuevo usuario</h3>
-    <div class="field"><label>Nombre completo</label><input id="nuName" placeholder="Nombre y apellidos"></div>
     <div class="field"><label>Perfil</label>
-      <select id="nuRole" onchange="document.getElementById('nuCuerdaWrap').style.display=this.value==='musico'?'block':'none'">
+      <select id="nuRole" onchange="
+        document.getElementById('nuAlumnoFields').style.display = this.value==='alumno' ? 'block':'none';
+        document.getElementById('nuMusicoFields').style.display = this.value==='musico' ? 'block':'none';
+      ">
         <option value="alumno">Alumno</option>
         <option value="musico">Músico</option>
       </select>
     </div>
-    <div class="field" id="nuCuerdaWrap" style="display:none;">
-      <label>Cuerda</label>
-      <select id="nuCuerda">${state.cuerdas.filter(c=>c!=='Viento Madera' && c!=='Viento Metal').map(c=>`<option>${c}</option>`).join('')}</select>
+    <div class="grid2">
+      <div class="field"><label>Nombre</label><input id="nuNombre"></div>
+      <div class="field"><label>Apellidos</label><input id="nuApellidos"></div>
+    </div>
+    <div id="nuAlumnoFields" style="display:block;">
+      <div class="field"><label>Domicilio</label><input id="nuDomicilio" placeholder="Calle, número, localidad"></div>
+      <div class="grid2">
+        <div class="field"><label>Teléfono</label><input id="nuTelefonoAlumno"></div>
+        <div class="field"><label>Edad</label><input id="nuEdad" type="number" min="0"
+          oninput="document.getElementById('nuTutorWrap').style.display = (Number(this.value)>0 && Number(this.value)<18) ? 'block':'none'"></div>
+      </div>
+      <div class="field" id="nuTutorWrap" style="display:none;"><label>Tutor/a legal</label><input id="nuTutor" placeholder="Nombre del padre/madre/tutor"></div>
+    </div>
+    <div id="nuMusicoFields" style="display:none;">
+      <div class="field"><label>Teléfono</label><input id="nuTelefonoMusico"></div>
+      <div class="field"><label>Cuerda</label><select id="nuCuerda">${cuerdasDisponibles.map(c=>`<option>${c}</option>`).join('')}</select></div>
     </div>
     <div class="grid2">
       <div class="field"><label>Usuario</label><input id="nuUsuario" placeholder="Ej: nombre.apellido"></div>
@@ -531,20 +570,32 @@ document.getElementById('createUserLink').addEventListener('click', ()=>{
     <button class="btn-primary" id="nuCreate">Crear cuenta</button>
   `);
   document.getElementById('nuCreate').addEventListener('click', ()=>{
-    const name = document.getElementById('nuName').value.trim();
     const role = document.getElementById('nuRole').value;
+    const nombre = document.getElementById('nuNombre').value.trim();
+    const apellidos = document.getElementById('nuApellidos').value.trim();
     const usuario = document.getElementById('nuUsuario').value.trim();
     const email = document.getElementById('nuEmail').value.trim();
     const pass = document.getElementById('nuPass').value;
-    if(!name || !pass){ toast('Completa nombre y contraseña.'); return; }
+    if(!nombre || !apellidos || !pass){ toast('Completa nombre, apellidos y contraseña.'); return; }
     if(!usuario && !email){ toast('Indica al menos el usuario o el correo electrónico.'); return; }
+    const name = nombre+' '+apellidos;
     const id = role.slice(0,2)+Math.floor(Math.random()*9000+1000);
-    if(role==='musico'){
-      const cuerda = document.getElementById('nuCuerda').value;
-      state.users.musico.push({id, name, pass, usuario, email, cuerda});
-      state.musicosBanda.push({id, name, cuerda});
+
+    if(role==='alumno'){
+      const domicilio = document.getElementById('nuDomicilio').value.trim();
+      const telefono = document.getElementById('nuTelefonoAlumno').value.trim();
+      const edad = Number(document.getElementById('nuEdad').value);
+      const menor = edad>0 && edad<18;
+      const tutor = menor ? document.getElementById('nuTutor').value.trim() : '';
+      if(!domicilio || !telefono || !edad){ toast('Completa domicilio, teléfono y edad.'); return; }
+      if(menor && !tutor){ toast('Indica el tutor/a legal: es obligatorio para menores de edad.'); return; }
+      state.users.alumno.push({id, name, nombre, apellidos, domicilio, telefono, edad, menor, tutor, usuario, email, pass, curso:'Sin asignar'});
     } else {
-      state.users[role].push({id, name, pass, usuario, email, curso:'Sin asignar'});
+      const telefono = document.getElementById('nuTelefonoMusico').value.trim();
+      const cuerda = document.getElementById('nuCuerda').value;
+      if(!telefono){ toast('Indica tu teléfono.'); return; }
+      state.users.musico.push({id, name, nombre, apellidos, telefono, usuario, email, pass, cuerda});
+      state.musicosBanda.push({id, name, cuerda});
     }
     closeModal();
     toast('Cuenta creada. Ya puedes iniciar sesión ✅','gold');
@@ -631,6 +682,7 @@ function buildNav(){
 
 function navigate(key){
   currentSection = key;
+  checkEncuestasCaducadas();
   if(window._asistenciaTimer){ clearInterval(window._asistenciaTimer); window._asistenciaTimer = null; }
   document.querySelectorAll('.nav-item').forEach(b=>b.classList.toggle('active', b.dataset.k===key));
   document.querySelectorAll('.bn-item').forEach(b=>b.classList.toggle('active', b.dataset.k===key));
@@ -650,6 +702,7 @@ document.getElementById('logoutBtn').addEventListener('click', ()=>{
   document.getElementById('loginIdentifier').value='';
   document.getElementById('passInput').value='';
   document.getElementById('loginErr').textContent='';
+  document.getElementById('loginCredentials').style.display='none';
   const hint = document.getElementById('loginHint');
   if(hint) hint.textContent='';
   selectedRole = null;
@@ -672,9 +725,32 @@ document.getElementById('notifBtn').addEventListener('click', ()=>{
 const RENDER = {};
 
 /* ---- ALUMNO ---- */
-const TIPOS_AVISO = ['Recordatorio','Cambio de horario o aula','Incidencia','Urgente','Académico / Matrícula','Ensayo o actuación','Institucional'];
+const TIPOS_AVISO = ['Recordatorio','Cambio de horario o aula','Incidencia','Urgente','Académico / Matrícula','Ensayo o actuación','Institucional','Resultado de encuesta'];
 
 function haExpirado(item){ return !!item.expira && Date.now() > item.expira; }
+
+function checkEncuestasCaducadas(){
+  state.encuestas.forEach(enc=>{
+    if(haExpirado(enc) && !enc.avisoGenerado){
+      generarAvisoResultadoEncuesta(enc);
+      enc.avisoGenerado = true;
+    }
+  });
+}
+
+function generarAvisoResultadoEncuesta(enc){
+  const counts = contarVotosEncuesta(enc);
+  const total = totalVotosEncuesta(enc);
+  const detalle = enc.opciones.map((op,i)=>`${op}: ${counts[i]} voto(s)`).join(' · ');
+  state.avisos.unshift({
+    id:Date.now()+Math.random(), para:enc.destinatario,
+    titulo:`Resultado: ${enc.pregunta}`,
+    texto:`${detalle} (${total} voto(s) en total).`,
+    tipo:'Resultado de encuesta', fecha:'hoy', urgente:false,
+    creado:Date.now(), expira:Date.now()+24*60*60000
+  });
+  notifCount++; updateNotifBadge();
+}
 
 function calcularExpiracion(idDuracion, idCustom){
   const dur = document.getElementById(idDuracion).value;
@@ -824,7 +900,7 @@ RENDER.calendario = ()=>{
     const perteneceCuerda = !e.cuerdas || e.cuerdas[0]==='todos' || e.cuerdas.includes(miCuerda);
     if(!perteneceCuerda) return false;
     return ahora <= fechaHoraDate(e).getTime() + 60*60000;
-  });
+  }).sort((a,b)=> fechaHoraDate(a).getTime() - fechaHoraDate(b).getTime());
   return `
   <h2 class="section-title">Calendario de ensayos</h2>
   <p class="section-sub">Tu cuerda: ${miCuerda||'—'}</p>
@@ -884,7 +960,7 @@ RENDER.chatcuerda = ()=>`
   <p class="tag-lock">🔒 Conversación cifrada · Cuerda: ${state.currentUser.cuerda||'General'}</p>
   <div class="chat-window">
     <div class="chat-msgs" id="chatMsgs">${renderChat('cuerda')}</div>
-    <div class="chat-input"><input id="chatInput" placeholder="Escribe un mensaje…"><button onclick="sendChat('cuerda')">➤</button></div>
+    <div class="chat-input"><textarea id="chatInput" rows="1" placeholder="Escribe un mensaje…" onkeydown="return manejarTeclaChat(event,'cuerda')" oninput="autoResizeChatInput(this)"></textarea><button onclick="sendChat('cuerda')">➤</button></div>
   </div>
 `;
 RENDER.chatprof = ()=>`
@@ -892,13 +968,24 @@ RENDER.chatprof = ()=>`
   <p class="tag-lock">🔒 Conversación cifrada · Ana García</p>
   <div class="chat-window">
     <div class="chat-msgs" id="chatMsgs">${renderChat('profAlumno')}</div>
-    <div class="chat-input"><input id="chatInput" placeholder="Escribe un mensaje…"><button onclick="sendChat('profAlumno')">➤</button></div>
+    <div class="chat-input"><textarea id="chatInput" rows="1" placeholder="Escribe un mensaje…" onkeydown="return manejarTeclaChat(event,'profAlumno')" oninput="autoResizeChatInput(this)"></textarea><button onclick="sendChat('profAlumno')">➤</button></div>
   </div>
 `;
 RENDER.chatdirector = RENDER.chatcuerda;
 
 function renderChat(key){
-  return state.chats[key].map(m=>`<div class="msg ${m.from==='me'?'me':'them'}">${m.text}<span class="t">${m.t}</span></div>`).join('');
+  return state.chats[key].map(m=>`<div class="msg ${m.from==='me'?'me':'them'}">${m.from!=='me' && m.name?`<span class="msg-sender">${m.name}</span>`:''}${m.text}<span class="t">${m.t}</span></div>`).join('');
+}
+function manejarTeclaChat(e, key){
+  if(e.key==='Enter' && !e.shiftKey){
+    e.preventDefault();
+    sendChat(key);
+    return false;
+  }
+}
+function autoResizeChatInput(el){
+  el.style.height='auto';
+  el.style.height = Math.min(el.scrollHeight, 120)+'px';
 }
 function sendChat(key){
   const inp = document.getElementById('chatInput');
@@ -908,6 +995,7 @@ function sendChat(key){
   document.getElementById('chatMsgs').innerHTML = renderChat(key);
   document.getElementById('chatMsgs').scrollTop = 9999;
   inp.value='';
+  inp.style.height='auto';
 }
 
 const PUNTOS = {ensayo:5, concierto:10, pasacalle:15, institucional:5};
@@ -1155,7 +1243,7 @@ function renderEncuestaResultados(enc){
   const total = totalVotosEncuesta(enc);
   return `
   <div class="card">
-    <div class="row"><h3>${enc.pregunta}</h3>${haExpirado(enc)?'<span class="chip red">Caducada</span>':'<span class="chip green">Vigente</span>'}</div>
+    <div class="row"><h3>${enc.pregunta}</h3>${haExpirado(enc)?'<span class="chip gold" style="background:rgba(227,167,43,.2); color:#8a6413;">Encuesta finalizada</span>':''}</div>
     <p class="meta" style="margin-bottom:8px;">${total} voto(s) · Dirigida a: ${etiquetaDestino(enc.destinatario)}</p>
     ${enc.opciones.map((op,i)=>`
       <div style="margin:8px 0;">
@@ -1402,57 +1490,121 @@ RENDER.avisosdirector = ()=>`
   <p class="section-sub">Publica avisos y consulta los ya enviados</p>
   <button class="btn-sm solid ocean" onclick="openModal(formNuevoAviso())">+ Nuevo aviso</button>
   <h3 style="font-family:var(--font-display); margin-top:18px;">Avisos publicados</h3>
-  ${state.avisos.map(a=>`
+  ${state.avisos.filter(a=>!haExpirado(a)).map(a=>`
     <div class="card">
-      <div class="row"><h3>${a.titulo}</h3>${haExpirado(a)?'<span class="chip red">Caducado</span>':'<span class="chip green">Vigente</span>'}</div>
-      <p class="meta">${a.tipo||'Info'} · Para: ${a.para==='todos'?'Todos':a.para}</p>
-      <p class="meta" style="margin-top:4px;">${a.texto}</p>
+      <div class="row"><h3>${a.titulo}</h3>${a.tipo==='Urgente'?'<span class="chip red">Urgente</span>':`<span class="chip blue">${a.tipo||'Info'}</span>`}</div>
+      <p class="meta" style="margin-top:6px;">Para: ${a.para==='todos'?'Todos':a.para}</p>
+      <div style="margin-top:8px; display:flex; justify-content:space-between; align-items:center; gap:12px;">
+        <p style="flex:1; margin:0; font-size:13.5px; line-height:1.5; color:var(--ink);">${a.texto}</p>
+        <div style="display:flex; gap:6px; flex-shrink:0;">
+          <button class="btn-sm" onclick="openModal(formNuevoAviso(${a.id}))">Editar</button>
+          <button class="btn-sm" onclick="eliminarAviso(${a.id})">Eliminar</button>
+        </div>
+      </div>
     </div>`).join('') || '<div class="empty"><span class="emoji">📣</span>No hay avisos publicados aún.</div>'}
 `;
 RENDER.avisosadmin = RENDER.avisosdirector;
-function formNuevoAviso(){
-  return `<h3>Nuevo aviso</h3>
+function formNuevoAviso(id){
+  const av = id ? state.avisos.find(a=>a.id===id) : null;
+  return `<h3>${av?'Editar aviso':'Nuevo aviso'}</h3>
   <div class="field"><label>Destinatarios</label>
-    <select id="avDest"><option value="todos">Todos</option><option value="musico">Músicos</option><option value="profesor">Profesores</option><option value="alumno">Alumnos</option></select>
+    <select id="avDest">
+      <option value="todos" ${av && av.para==='todos'?'selected':''}>Todos</option>
+      <option value="musico" ${av && av.para==='musico'?'selected':''}>Músicos</option>
+      <option value="profesor" ${av && av.para==='profesor'?'selected':''}>Profesores</option>
+      <option value="alumno" ${av && av.para==='alumno'?'selected':''}>Alumnos</option>
+    </select>
   </div>
   <div class="field"><label>Tipo de aviso</label>
-    <select id="avTipo">${TIPOS_AVISO.map(t=>`<option>${t}</option>`).join('')}</select>
+    <select id="avTipo">${TIPOS_AVISO.map(t=>`<option ${av && av.tipo===t?'selected':''}>${t}</option>`).join('')}</select>
   </div>
-  <div class="field"><label>Título</label><input id="avTitulo"></div>
-  <div class="field"><label>Mensaje</label><textarea id="avTexto" rows="3" style="width:100%; padding:12px; border-radius:12px; border:1.5px solid var(--line);"></textarea></div>
-  ${selectorDuracion('av')}
-  <button class="btn-primary" onclick="crearAviso()">Publicar aviso</button>`;
+  <div class="field"><label>Título</label><input id="avTitulo" value="${av?av.titulo:''}"></div>
+  <div class="field"><label>Mensaje</label><textarea id="avTexto" rows="3" style="width:100%; padding:12px; border-radius:12px; border:1.5px solid var(--line);">${av?av.texto:''}</textarea></div>
+  ${av ? '' : selectorDuracion('av')}
+  <button class="btn-primary" onclick="guardarAviso(${av? av.id : 'null'})">${av?'Guardar cambios':'Publicar aviso'}</button>`;
 }
-function crearAviso(){
+function guardarAviso(id){
   const titulo = document.getElementById('avTitulo').value.trim();
   const texto = document.getElementById('avTexto').value.trim();
   const para = document.getElementById('avDest').value;
   const tipo = document.getElementById('avTipo').value;
   if(!titulo||!texto){ toast('Completa título y mensaje.'); return; }
-  const expira = calcularExpiracion('avDuracion','avCustom');
-  if(expira===null){ toast('Indica la fecha y hora de expiración.'); return; }
-  state.avisos.unshift({id:Date.now(), para, titulo, texto, tipo, fecha:'hoy', urgente:tipo==='Urgente', creado:Date.now(), expira});
-  notifCount++; updateNotifBadge();
+  if(id){
+    const av = state.avisos.find(a=>a.id===id);
+    Object.assign(av, {titulo, texto, para, tipo, urgente:tipo==='Urgente'});
+    toast('Aviso actualizado ✅','gold');
+  } else {
+    const expira = calcularExpiracion('avDuracion','avCustom');
+    if(expira===null){ toast('Indica la fecha y hora de expiración.'); return; }
+    state.avisos.unshift({id:Date.now(), para, titulo, texto, tipo, fecha:'hoy', urgente:tipo==='Urgente', creado:Date.now(), expira});
+    notifCount++; updateNotifBadge();
+    toast('Aviso publicado ✅','gold');
+  }
   closeModal();
   navigate(state.currentUser.role==='admin'?'avisosadmin':'avisosdirector');
-  toast('Aviso publicado ✅','gold');
+}
+function eliminarAviso(id){
+  openModal(`<h3>Eliminar aviso</h3>
+    <p class="meta">Esta acción no se puede deshacer. ¿Confirmas la eliminación?</p>
+    <div style="display:flex; gap:8px; margin-top:16px;">
+      <button class="btn-sm solid" onclick="confirmarEliminarAviso(${id})">Sí, eliminar</button>
+      <button class="btn-sm" onclick="closeModal()">Cancelar</button>
+    </div>`);
+}
+function confirmarEliminarAviso(id){
+  state.avisos = state.avisos.filter(a=>a.id!==id);
+  closeModal();
+  navigate(state.currentUser.role==='admin'?'avisosadmin':'avisosdirector');
+  toast('Aviso eliminado.');
 }
 
-RENDER.calendariodirector = RENDER.calendarioadmin = ()=>`
+RENDER.calendariodirector = RENDER.calendarioadmin = ()=>{
+  const ahora = Date.now();
+  const visibles = state.ensayos
+    .filter(e=> ahora <= fechaHoraDate(e).getTime() + 2*60*60000)
+    .sort((a,b)=> fechaHoraDate(a).getTime() - fechaHoraDate(b).getTime());
+  const proximo = visibles.find(e=> fechaHoraDate(e).getTime() >= ahora) || visibles[0];
+  return `
   <h2 class="section-title">Calendario de ensayos</h2>
   <button class="btn-sm solid ocean" onclick="openModal(formNuevoEnsayo())">+ Nuevo ensayo</button>
   <div style="margin-top:14px;">
-  ${state.ensayos.map(e=>`
-    <div class="card">
-      <div class="row"><h3>${formatEnsayoFecha(e.fecha)} · ${e.hora}</h3><span class="chip ${e.cuerdas && e.cuerdas[0]==='todos' ? 'blue':'gold'}" style="background:${e.cuerdas && e.cuerdas[0]==='todos' ? '': 'rgba(227,167,43,.2)'}; color:${e.cuerdas && e.cuerdas[0]==='todos' ? '' : '#8a6413'};">${e.cuerdas && e.cuerdas[0]==='todos' ? 'Banda Completa' : (e.cuerdas||[]).join(', ')}</span></div>
-      <p class="meta">📍 ${e.lugar}</p>
-      <div style="margin-top:8px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-        ${botonUbicacion('ensayo', e)}
-        <button class="btn-sm" onclick="openModal(formNuevoEnsayo(${e.id}))">Editar</button>
+  ${visibles.map(e=>{
+    const esProximo = proximo && e.id===proximo.id;
+    const esTodos = !e.cuerdas || e.cuerdas[0]==='todos';
+    return `
+    <div class="card" style="${esProximo?'border:2px solid var(--dorado); box-shadow:0 6px 20px -8px rgba(227,167,43,.4);':''}">
+      <div class="row">
+        <h3>${formatEnsayoFecha(e.fecha)} · ${e.hora} ${esProximo?'<span class="chip gold" style="background:rgba(227,167,43,.3); color:#8a6413; margin-left:6px;">⭐ Próximo ensayo</span>':''}</h3>
+        <span class="chip ${esTodos?'blue':'gold'}" style="${esTodos?'':'background:rgba(227,167,43,.2); color:#8a6413;'}">${esTodos?'Banda Completa':e.cuerdas.join(', ')}</span>
       </div>
-    </div>`).join('') || '<div class="empty"><span class="emoji">📅</span>No hay ensayos programados.</div>'}
-  </div>
-`;
+      <p class="meta" style="margin-top:6px;">📍 ${e.lugar}</p>
+      <div style="margin-top:8px; display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap;">
+        ${botonUbicacion('ensayo', e)}
+        <div style="display:flex; gap:6px;">
+          <button class="btn-sm" onclick="openModal(formNuevoEnsayo(${e.id}))">Editar</button>
+          <button class="btn-sm" onclick="eliminarEnsayo(${e.id})">Eliminar</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('') || '<div class="empty"><span class="emoji">📅</span>No hay ensayos programados.</div>'}
+  </div>`;
+};
+
+function eliminarEnsayo(id){
+  openModal(`<h3>Eliminar ensayo</h3>
+    <p class="meta">Esta acción no se puede deshacer. ¿Confirmas la eliminación?</p>
+    <div style="display:flex; gap:8px; margin-top:16px;">
+      <button class="btn-sm solid" onclick="confirmarEliminarEnsayo(${id})">Sí, eliminar</button>
+      <button class="btn-sm" onclick="closeModal()">Cancelar</button>
+    </div>`);
+}
+function confirmarEliminarEnsayo(id){
+  state.ensayos = state.ensayos.filter(e=>e.id!==id);
+  closeModal();
+  navigate(state.currentUser.role==='admin'?'calendarioadmin':'calendariodirector');
+  toast('Ensayo eliminado.');
+}
+
 function formNuevoEnsayo(id){
   const en = id ? state.ensayos.find(e=>e.id===id) : null;
   const cuerdasEspecificas = en && en.cuerdas && en.cuerdas[0]!=='todos';
@@ -1544,15 +1696,17 @@ RENDER.actuaciones = ()=>`
     <div class="card" style="cursor:pointer;" onclick="verDetalleActuacion(${e.id})">
       <div class="row">
         <h3>${e.nombre}</h3>
-        <div style="display:flex; gap:6px;" onclick="event.stopPropagation()">
+        <span class="chip ${tipoActuacionChipClass(e.tipo)}" style="${tipoActuacionChipStyle(e.tipo)}">${tipoActuacionLabel(e.tipo)} · ${tipoActuacionPuntos(e.tipo)} pts</span>
+      </div>
+      <p class="meta" style="margin-top:6px;">📍 ${e.lugar} · ${formatFecha(e.fecha)} · ${e.hora}</p>
+      <p class="meta">✅ ${c.si} van · ❌ ${c.no} no van · ⏳ ${c.pendiente} sin responder</p>
+      <div style="margin-top:8px; display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap;" onclick="event.stopPropagation()">
+        ${botonUbicacion('actuacion', e)}
+        <div style="display:flex; gap:6px;">
           <button class="btn-sm" onclick="openModal(formActuacion(${e.id}))">Editar</button>
           <button class="btn-sm" onclick="eliminarActuacion(${e.id})">Eliminar</button>
         </div>
       </div>
-      <p class="meta"><span class="chip ${tipoActuacionChipClass(e.tipo)}" style="${tipoActuacionChipStyle(e.tipo)}">${tipoActuacionLabel(e.tipo)} · ${tipoActuacionPuntos(e.tipo)} pts</span></p>
-      <p class="meta">📍 ${e.lugar} · ${formatFecha(e.fecha)} · ${e.hora}</p>
-      <p class="meta">✅ ${c.si} van · ❌ ${c.no} no van · ⏳ ${c.pendiente} sin responder</p>
-      <div style="margin-top:8px;" onclick="event.stopPropagation()">${botonUbicacion('actuacion', e)}</div>
     </div>`;
   }).join('') || '<div class="empty"><span class="emoji">🎭</span>No hay actuaciones programadas.</div>'}
   </div>
