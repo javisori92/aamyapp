@@ -114,7 +114,9 @@ input,select,textarea{font-family:inherit;}
   padding:14px 18px; background:linear-gradient(120deg, var(--vino-dark), var(--vino));
   color:var(--blanco); box-shadow:0 4px 18px -8px rgba(0,0,0,0.4);
 }
-.topbar .who{display:flex; align-items:center; gap:10px;}
+.topbar .who{display:flex; align-items:center; gap:10px; cursor:pointer; border-radius:12px; padding:4px 6px; margin:-4px -6px; transition:.15s;}
+.topbar .who:active{background:rgba(255,255,255,0.12);}
+.who-hint{display:none; font-size:11px; opacity:.75;}
 .avatar{
   width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg,var(--dorado),var(--dorado-soft));
   display:flex; align-items:center; justify-content:center; font-weight:700; color:var(--vino-dark); font-size:15px;
@@ -136,6 +138,10 @@ input,select,textarea{font-family:inherit;}
   width:230px; padding:20px 12px; display:none; flex-direction:column; gap:4px; border-right:1px solid var(--line);
 }
 .sidenav.show{display:flex;}
+.sidenav-header{display:none; flex-direction:column; align-items:center; text-align:center; padding-bottom:16px; margin-bottom:10px; border-bottom:1px solid var(--line);}
+.sidenav-avatar{width:64px; height:64px; border-radius:50%; overflow:hidden; background:linear-gradient(135deg,var(--dorado),var(--dorado-soft)); display:flex; align-items:center; justify-content:center; font-weight:700; color:var(--vino-dark); font-size:22px; margin-bottom:8px;}
+.sidenav-name{font-weight:700; font-size:15px; color:var(--ink); line-height:1.2;}
+.sidenav-role{font-size:11px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.5px; margin-top:2px;}
 .nav-item{
   display:flex; align-items:center; gap:10px; padding:11px 14px; border-radius:12px; border:none; background:none;
   text-align:left; font-size:14px; font-weight:600; color:var(--ink-soft); transition:.15s;
@@ -184,6 +190,7 @@ input,select,textarea{font-family:inherit;}
 .list-item{display:flex; align-items:center; justify-content:space-between; padding:12px 0; border-bottom:1px solid var(--line);}
 .list-item:last-child{border-bottom:none;}
 
+.table-wrap{width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch;}
 table{width:100%; border-collapse:collapse; font-size:13px;}
 th,td{padding:9px 8px; text-align:left; border-bottom:1px solid var(--line);}
 th{color:var(--ink-soft); font-weight:700; font-size:11.5px; text-transform:uppercase; letter-spacing:.4px;}
@@ -237,6 +244,28 @@ th{color:var(--ink-soft); font-weight:700; font-size:11.5px; text-transform:uppe
 
 .tag-lock{display:inline-flex; align-items:center; gap:4px; font-size:11px; color:var(--ink-soft);}
 
+@media(max-width:400px){
+  .login-card{padding:28px 20px 22px;}
+  .content{padding:16px 12px 90px;}
+  .card{padding:14px;}
+  .chat-window{height:360px;}
+}
+@media(max-width:859px){
+  .who-hint{display:inline;}
+  .sidenav-header{display:flex;}
+  .sidenav{
+    position:fixed; top:0; left:0; height:100dvh; width:270px; max-width:82vw;
+    background:var(--blanco); z-index:50; transform:translateX(-100%);
+    transition:transform .28s cubic-bezier(.2,.8,.2,1); box-shadow:10px 0 34px -12px rgba(0,0,0,0.35);
+    padding:24px 16px 20px; overflow-y:auto; display:flex !important; border-right:none;
+  }
+  .sidenav.mobile-open{transform:translateX(0);}
+  .sidenav-overlay{
+    position:fixed; inset:0; background:rgba(35,28,26,0.45); z-index:45;
+    opacity:0; pointer-events:none; transition:opacity .25s ease;
+  }
+  .sidenav-overlay.show{opacity:1; pointer-events:auto;}
+}
 @media(min-width:860px){
   .sidenav.desktop-show{display:flex;}
   .bottomnav.desktop-hide{display:none;}
@@ -287,10 +316,10 @@ th{color:var(--ink-soft); font-weight:700; font-size:11.5px; text-transform:uppe
 <!-- ===================== APP ===================== -->
 <div id="app-screen">
   <div class="topbar">
-    <div class="who">
+    <div class="who" id="whoToggle" onclick="toggleSidebarMobile()">
       <div class="avatar" id="avatarLetter">A</div>
       <div>
-        <div class="name" id="topName">—</div>
+        <div class="name"><span id="topName">—</span> <span class="who-hint">▸</span></div>
         <div class="role" id="topRole">—</div>
       </div>
     </div>
@@ -305,6 +334,7 @@ th{color:var(--ink-soft); font-weight:700; font-size:11.5px; text-transform:uppe
     <nav class="sidenav" id="sideNav"></nav>
     <main class="content" id="content"></main>
   </div>
+  <div class="sidenav-overlay" id="sidenavOverlay" onclick="closeSidebarMobile()"></div>
 
   <nav class="bottomnav desktop-hide" id="bottomNav"></nav>
 </div>
@@ -417,7 +447,11 @@ const state = {
       asistencias:{mu1:null, mu2:null, m3:null, m4:'si', m5:null, m6:null, m7:'si', m8:null}}
   ],
 
-  cuerdas: ['Saxofones','Clarinetes','Flautas','Fagot','Oboe','Violonchelos','Trompas','Trompetas','Trombones','Tubas','Percusión','Viento Madera','Viento Metal'],
+  cuerdas: ['Saxofones','Clarinetes','Flautas','Fagot','Oboe','Violonchelos','Trompas','Trompetas','Trombones','Tubas','Bombardinos','Percusión','Viento Madera','Viento Metal'],
+  gruposCuerda: {
+    'Viento Madera': ['Fagot','Oboe','Flautas','Clarinetes','Saxofones'],
+    'Viento Metal': ['Trompetas','Trombones','Tubas','Trompas','Bombardinos']
+  },
   asignaturas: [
     {id:1, nombre:'Piano', profesor:'Prof. Martínez', tipo:'Individual'},
     {id:2, nombre:'Solfeo 1º Iniciación', profesor:'Prof. Alarcón', tipo:'Colectiva', horario:'Mié 18:00'}
@@ -461,7 +495,7 @@ function openModal(html){
   document.getElementById('modalBody').innerHTML = html;
   document.getElementById('modalBg').classList.add('show');
 }
-function closeModal(){ document.getElementById('modalBg').classList.remove('show'); }
+function closeModal(){ document.getElementById('modalBg').classList.remove('show'); if(typeof limpiarCropDrag==='function') limpiarCropDrag(); }
 document.getElementById('modalBg').addEventListener('click', e=>{ if(e.target.id==='modalBg') closeModal(); });
 
 /* Enter para validar: en modales activa el botón principal (.btn-primary);
@@ -483,6 +517,10 @@ document.addEventListener('keydown', (e)=>{
 });
 
 function initials(name){ return name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase(); }
+function avatarHTML(user){
+  if(user && user.foto) return `<img src="${user.foto}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+  return initials(user ? user.name : '');
+}
 
 /* =========================================================================
    LOGIN
@@ -625,7 +663,7 @@ const NAV = {
     {k:'ranking', l:'Ranking', e:'🏆'},
     {k:'encuestas', l:'Encuestas', e:'📊'},
     {k:'avisos', l:'Avisos', e:'🔔'},
-    {k:'infomusico', l:'Mi información', e:'👤'}
+    {k:'infomusico', l:'Mi Perfil', e:'👤'}
   ],
   profesor: [
     {k:'horarioprof', l:'Horario', e:'🗓️'},
@@ -660,7 +698,7 @@ function enterApp(){
   document.getElementById('login-screen').style.display='none';
   document.getElementById('app-screen').style.display='flex';
   const u = state.currentUser;
-  document.getElementById('avatarLetter').textContent = initials(u.name);
+  document.getElementById('avatarLetter').innerHTML = avatarHTML(u);
   document.getElementById('topName').textContent = u.name;
   document.getElementById('topRole').textContent = roleLabels[u.role];
   buildNav();
@@ -670,14 +708,52 @@ function enterApp(){
 
 function buildNav(){
   const items = NAV[state.currentUser.role];
+  const u = state.currentUser;
   const side = document.getElementById('sideNav');
   const bottom = document.getElementById('bottomNav');
   side.className = 'sidenav desktop-show';
-  side.innerHTML = items.map(i=>`<button class="nav-item" data-k="${i.k}"><span class="emoji">${i.e}</span>${i.l}</button>`).join('');
-  bottom.innerHTML = items.slice(0,5).map(i=>`<button class="bn-item" data-k="${i.k}"><span class="emoji">${i.e}</span>${i.l.split(' ')[0]}</button>`).join('');
-  document.querySelectorAll('.nav-item, .bn-item').forEach(b=>{
-    b.addEventListener('click', ()=>navigate(b.dataset.k));
+  side.innerHTML = `
+    <div class="sidenav-header">
+      <div class="sidenav-avatar">${avatarHTML(u)}</div>
+      <div class="sidenav-name">${u.name}</div>
+      <div class="sidenav-role">${roleLabels[u.role]}</div>
+    </div>
+  ` + items.map(i=>`<button class="nav-item" data-k="${i.k}"><span class="emoji">${i.e}</span>${i.l}</button>`).join('');
+
+  const maxBottom = 4;
+  const principales = items.slice(0, maxBottom);
+  const hayMas = items.length > maxBottom;
+  bottom.innerHTML = principales.map(i=>`<button class="bn-item" data-k="${i.k}"><span class="emoji">${i.e}</span>${i.l.split(' ')[0]}</button>`).join('')
+    + (hayMas ? `<button class="bn-item" id="bnMas" onclick="toggleSidebarMobile()"><span class="emoji">☰</span>Más</button>` : '');
+
+  document.querySelectorAll('.nav-item, .bn-item[data-k]').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      navigate(b.dataset.k);
+      closeSidebarMobile();
+      if(b.dataset.k.startsWith('avisos')){ notifCount = 0; updateNotifBadge(); }
+    });
   });
+}
+
+function actualizarCabeceraSidenav(){
+  const u = state.currentUser;
+  const av = document.querySelector('.sidenav-avatar');
+  const nm = document.querySelector('.sidenav-name');
+  if(av) av.innerHTML = avatarHTML(u);
+  if(nm) nm.textContent = u.name;
+}
+
+function openSidebarMobile(){
+  document.getElementById('sideNav').classList.add('mobile-open');
+  document.getElementById('sidenavOverlay').classList.add('show');
+}
+function closeSidebarMobile(){
+  document.getElementById('sideNav').classList.remove('mobile-open');
+  document.getElementById('sidenavOverlay').classList.remove('show');
+}
+function toggleSidebarMobile(){
+  const sn = document.getElementById('sideNav');
+  if(sn.classList.contains('mobile-open')) closeSidebarMobile(); else openSidebarMobile();
 }
 
 function navigate(key){
@@ -801,8 +877,8 @@ RENDER.info = ()=>{
       ${u.menor?'<span class="chip red">Alumno menor de edad · acceso tutelado</span>':''}
     </div>
     <div class="card"><h3>Horario semanal</h3>
-      <table><thead><tr><th>Día</th><th>Hora</th><th>Asignatura</th><th>Profesor</th></tr></thead>
-      <tbody>${state.horarioAlumno.map(h=>`<tr><td>${h.dia}</td><td>${h.hora}</td><td>${h.asig}</td><td>${h.prof}</td></tr>`).join('')}</tbody></table>
+      <div class="table-wrap"><table><thead><tr><th>Día</th><th>Hora</th><th>Asignatura</th><th>Profesor</th></tr></thead>
+      <tbody>${state.horarioAlumno.map(h=>`<tr><td>${h.dia}</td><td>${h.hora}</td><td>${h.asig}</td><td>${h.prof}</td></tr>`).join('')}</tbody></table></div>
     </div>
     ${u.menor?`<div class="card"><h3>Acceso familiar</h3>
       <p class="meta" style="margin-bottom:10px;">Como alumno menor de edad, un padre, madre o tutor legal puede solicitar acceso vinculado a este perfil, conforme a la normativa de protección de datos y de menores.</p>
@@ -827,8 +903,8 @@ RENDER.progreso = ()=>`
 
 RENDER.calif = ()=>`
   <h2 class="section-title">Calificaciones</h2><p class="section-sub">Trimestre 3</p>
-  <div class="card"><table><thead><tr><th>Asignatura</th><th>Nota</th></tr></thead>
-  <tbody>${state.calificaciones.map(c=>`<tr><td>${c.asig}</td><td><b>${c.nota}</b></td></tr>`).join('')}</tbody></table></div>
+  <div class="card"><div class="table-wrap"><table><thead><tr><th>Asignatura</th><th>Nota</th></tr></thead>
+  <tbody>${state.calificaciones.map(c=>`<tr><td>${c.asig}</td><td><b>${c.nota}</b></td></tr>`).join('')}</tbody></table></div></div>
 `;
 
 RENDER.tareas = ()=>`
@@ -897,7 +973,7 @@ RENDER.calendario = ()=>{
   const miCuerda = state.currentUser.cuerda;
   const ahora = Date.now();
   const relevantes = state.ensayos.filter(e=>{
-    const perteneceCuerda = !e.cuerdas || e.cuerdas[0]==='todos' || e.cuerdas.includes(miCuerda);
+    const perteneceCuerda = perteneceAEnsayo(e, miCuerda);
     if(!perteneceCuerda) return false;
     return ahora <= fechaHoraDate(e).getTime() + 60*60000;
   }).sort((a,b)=> fechaHoraDate(a).getTime() - fechaHoraDate(b).getTime());
@@ -1022,17 +1098,29 @@ function tipoActuacionChipStyle(tipo){
   return (tipo==='concierto' || !tipo) ? '' : 'background:rgba(227,167,43,.2); color:#8a6413;';
 }
 
+function expandirCuerdas(lista){
+  const resultado = new Set();
+  (lista||[]).forEach(c=>{
+    if(state.gruposCuerda[c]) state.gruposCuerda[c].forEach(x=>resultado.add(x));
+    else resultado.add(c);
+  });
+  return Array.from(resultado);
+}
+function perteneceAEnsayo(ensayo, cuerdaMusico){
+  if(!ensayo.cuerdas || ensayo.cuerdas[0]==='todos') return true;
+  return expandirCuerdas(ensayo.cuerdas).includes(cuerdaMusico);
+}
 function musicosRelevantes(ensayo){
-  return (!ensayo.cuerdas || ensayo.cuerdas[0]==='todos')
-    ? state.musicosBanda
-    : state.musicosBanda.filter(m=>ensayo.cuerdas.includes(m.cuerda));
+  if(!ensayo.cuerdas || ensayo.cuerdas[0]==='todos') return state.musicosBanda;
+  const expandido = expandirCuerdas(ensayo.cuerdas);
+  return state.musicosBanda.filter(m=>expandido.includes(m.cuerda));
 }
 
 RENDER.asistencia = ()=>{
   const miId = state.currentUser.id, miCuerda = state.currentUser.cuerda;
   const ahora = Date.now();
   const ensayosRel = state.ensayos.filter(e=>{
-    const perteneceCuerda = !e.cuerdas || e.cuerdas[0]==='todos' || e.cuerdas.includes(miCuerda);
+    const perteneceCuerda = perteneceAEnsayo(e, miCuerda);
     if(!perteneceCuerda) return false;
     return ahora <= fechaHoraDate(e).getTime() + 3*60*60000;
   });
@@ -1340,8 +1428,15 @@ RENDER.encuestasadmin = ()=>{
 RENDER.infomusico = ()=>{
   const u = state.currentUser;
   return `
-  <h2 class="section-title">Mi información</h2><p class="section-sub">Consulta y edita tus datos personales</p>
+  <h2 class="section-title">Mi Perfil</h2><p class="section-sub">Consulta y edita tus datos personales</p>
   <div class="card">
+    <div style="display:flex; justify-content:center; margin-bottom:18px;">
+      <div style="position:relative; width:96px; height:96px; cursor:pointer;" onclick="document.getElementById('fotoInput').click()">
+        <div style="width:96px; height:96px; border-radius:50%; overflow:hidden; background:linear-gradient(135deg,var(--dorado),var(--dorado-soft)); display:flex; align-items:center; justify-content:center; font-weight:700; color:var(--vino-dark); font-size:28px; box-shadow:var(--shadow);">${avatarHTML(u)}</div>
+        <div style="position:absolute; bottom:0; right:0; width:30px; height:30px; border-radius:50%; background:var(--vino); color:var(--blanco); display:flex; align-items:center; justify-content:center; font-size:14px; border:2px solid var(--blanco);">📷</div>
+      </div>
+      <input type="file" id="fotoInput" accept="image/*" style="display:none" onchange="cambiarFotoPerfil(event)">
+    </div>
     <div class="grid2">
       <div class="field"><label>Nombre</label><input id="imNombre" value="${u.nombre||''}"></div>
       <div class="field"><label>Apellidos</label><input id="imApellidos" value="${u.apellidos||''}"></div>
@@ -1358,6 +1453,143 @@ RENDER.infomusico = ()=>{
     <button class="btn-sm solid" onclick="guardarInfoMusico()">Guardar cambios</button>
   </div>
 `;};
+
+function cambiarFotoPerfil(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  if(!file.type.startsWith('image/')){ toast('Selecciona un archivo de imagen.'); return; }
+  const reader = new FileReader();
+  reader.onload = (ev)=> abrirEditorFoto(ev.target.result);
+  reader.readAsDataURL(file);
+  e.target.value = '';
+}
+
+let cropState = {};
+let cropDragHandlers = null;
+const CROP_SIZE = 220;
+
+function abrirEditorFoto(dataUrl){
+  cropState = {naturalW:0, naturalH:0, baseScale:1, zoom:1, offsetX:0, offsetY:0};
+  openModal(`
+    <h3>Ajustar foto de perfil</h3>
+    <p class="meta" style="margin-bottom:12px;">Arrastra para mover y usa el control para hacer zoom.</p>
+    <div style="display:flex; justify-content:center;">
+      <div id="cropStage" style="width:${CROP_SIZE}px; height:${CROP_SIZE}px; border-radius:50%; overflow:hidden; position:relative; background:#111; touch-action:none; cursor:grab; box-shadow:var(--shadow);">
+        <img id="cropImg" src="${dataUrl}" draggable="false" onload="onCropImageLoad()" style="position:absolute; left:0; top:0; user-select:none;">
+      </div>
+    </div>
+    <div class="field" style="margin-top:16px;">
+      <label>Zoom</label>
+      <input type="range" id="cropZoom" min="100" max="300" value="100" style="width:100%;" oninput="onCropZoomChange(this.value)">
+    </div>
+    <div style="display:flex; gap:8px; margin-top:6px;">
+      <button class="btn-sm" onclick="closeModal()">Cancelar</button>
+      <button class="btn-primary" style="flex:1;" onclick="aceptarRecorteFoto()">Aceptar</button>
+    </div>
+  `);
+  wireCropDrag();
+}
+
+function onCropImageLoad(){
+  const imgEl = document.getElementById('cropImg');
+  if(!imgEl) return;
+  cropState.naturalW = imgEl.naturalWidth;
+  cropState.naturalH = imgEl.naturalHeight;
+  cropState.baseScale = Math.max(CROP_SIZE/cropState.naturalW, CROP_SIZE/cropState.naturalH);
+  cropState.zoom = 1;
+  centrarCrop();
+}
+function onCropZoomChange(val){
+  cropState.zoom = Number(val)/100;
+  clampCropOffset();
+}
+function aplicarTransformCrop(){
+  const imgEl = document.getElementById('cropImg');
+  if(!imgEl || !cropState.naturalW) return;
+  const w = cropState.naturalW * cropState.baseScale * cropState.zoom;
+  const h = cropState.naturalH * cropState.baseScale * cropState.zoom;
+  imgEl.style.width = w+'px';
+  imgEl.style.height = h+'px';
+  imgEl.style.left = cropState.offsetX+'px';
+  imgEl.style.top = cropState.offsetY+'px';
+}
+function clampCropOffset(){
+  if(!cropState.naturalW) return;
+  const w = cropState.naturalW * cropState.baseScale * cropState.zoom;
+  const h = cropState.naturalH * cropState.baseScale * cropState.zoom;
+  const minX = Math.min(0, CROP_SIZE - w), maxX = 0;
+  const minY = Math.min(0, CROP_SIZE - h), maxY = 0;
+  cropState.offsetX = Math.max(minX, Math.min(maxX, cropState.offsetX));
+  cropState.offsetY = Math.max(minY, Math.min(maxY, cropState.offsetY));
+  aplicarTransformCrop();
+}
+function centrarCrop(){
+  const w = cropState.naturalW * cropState.baseScale * cropState.zoom;
+  const h = cropState.naturalH * cropState.baseScale * cropState.zoom;
+  cropState.offsetX = (CROP_SIZE - w)/2;
+  cropState.offsetY = (CROP_SIZE - h)/2;
+  aplicarTransformCrop();
+}
+function wireCropDrag(){
+  const stage = document.getElementById('cropStage');
+  if(!stage) return;
+  let dragging=false, startX=0, startY=0, startOffX=0, startOffY=0;
+  function onDown(e){
+    const p = e.touches ? e.touches[0] : e;
+    dragging=true; startX=p.clientX; startY=p.clientY;
+    startOffX=cropState.offsetX; startOffY=cropState.offsetY;
+    stage.style.cursor='grabbing';
+    e.preventDefault();
+  }
+  function onMove(e){
+    if(!dragging) return;
+    const p = e.touches ? e.touches[0] : e;
+    cropState.offsetX = startOffX + (p.clientX-startX);
+    cropState.offsetY = startOffY + (p.clientY-startY);
+    clampCropOffset();
+  }
+  function onUp(){ dragging=false; if(stage) stage.style.cursor='grab'; }
+
+  stage.addEventListener('mousedown', onDown);
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onUp);
+  stage.addEventListener('touchstart', onDown, {passive:false});
+  document.addEventListener('touchmove', onMove, {passive:false});
+  document.addEventListener('touchend', onUp);
+
+  cropDragHandlers = {onMove, onUp};
+}
+function limpiarCropDrag(){
+  if(!cropDragHandlers) return;
+  document.removeEventListener('mousemove', cropDragHandlers.onMove);
+  document.removeEventListener('mouseup', cropDragHandlers.onUp);
+  document.removeEventListener('touchmove', cropDragHandlers.onMove);
+  document.removeEventListener('touchend', cropDragHandlers.onUp);
+  cropDragHandlers = null;
+}
+function aceptarRecorteFoto(){
+  const imgEl = document.getElementById('cropImg');
+  if(!imgEl || !cropState.naturalW){ toast('Espera a que la imagen termine de cargar.'); return; }
+  const w = cropState.naturalW * cropState.baseScale * cropState.zoom;
+  const h = cropState.naturalH * cropState.baseScale * cropState.zoom;
+  const canvas = document.createElement('canvas');
+  canvas.width = CROP_SIZE; canvas.height = CROP_SIZE;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(imgEl, cropState.offsetX, cropState.offsetY, w, h);
+  aplicarNuevaFoto(canvas.toDataURL('image/png'));
+  closeModal();
+}
+function aplicarNuevaFoto(dataUrl){
+  state.currentUser.foto = dataUrl;
+  const loginUser = state.users.musico.find(m=>m.id===state.currentUser.id);
+  if(loginUser) loginUser.foto = dataUrl;
+  const bandaUser = state.musicosBanda.find(m=>m.id===state.currentUser.id);
+  if(bandaUser) bandaUser.foto = dataUrl;
+  document.getElementById('avatarLetter').innerHTML = avatarHTML(state.currentUser);
+  actualizarCabeceraSidenav();
+  if(currentSection==='infomusico') navigate('infomusico');
+  toast('Foto de perfil actualizada ✅','gold');
+}
 
 function guardarInfoMusico(){
   const nombre = document.getElementById('imNombre').value.trim();
@@ -1377,7 +1609,8 @@ function guardarInfoMusico(){
   const bandaUser = state.musicosBanda.find(m=>m.id===state.currentUser.id);
   if(bandaUser) Object.assign(bandaUser, {name});
   document.getElementById('topName').textContent = name;
-  document.getElementById('avatarLetter').textContent = initials(name);
+  document.getElementById('avatarLetter').innerHTML = avatarHTML(state.currentUser);
+  actualizarCabeceraSidenav();
   navigate('infomusico');
   toast('Datos actualizados ✅','gold');
 }
@@ -1386,8 +1619,8 @@ function guardarInfoMusico(){
 /* ---- PROFESOR ---- */
 RENDER.horarioprof = ()=>`
   <h2 class="section-title">Horario semanal</h2><p class="section-sub">Franjas por alumno</p>
-  <div class="card"><table><thead><tr><th>Día</th><th>Hora</th><th>Alumno</th></tr></thead>
-  <tbody>${state.horarioProfesor.map(h=>`<tr><td>${h.dia}</td><td>${h.hora}</td><td>${h.alumno}</td></tr>`).join('')}</tbody></table></div>
+  <div class="card"><div class="table-wrap"><table><thead><tr><th>Día</th><th>Hora</th><th>Alumno</th></tr></thead>
+  <tbody>${state.horarioProfesor.map(h=>`<tr><td>${h.dia}</td><td>${h.hora}</td><td>${h.alumno}</td></tr>`).join('')}</tbody></table></div></div>
   <button class="btn-sm solid" onclick="openModal(formAsignarHorario())">+ Asignar horario a alumno</button>
 `;
 function formAsignarHorario(){
@@ -1951,7 +2184,17 @@ RENDER.estadisticas = ()=>`
 
 RENDER.cuerdas = ()=>`
   <h2 class="section-title">Gestionar cuerdas</h2>
-  ${state.cuerdas.map(c=>`<div class="card list-item" style="border:none;"><span>${c}</span><span class="chip blue">${state.users.musico.filter(m=>m.cuerda===c).length} músicos</span></div>`).join('')}
+  <p class="section-sub">Viento Madera y Viento Metal son grupos que agrupan otras cuerdas</p>
+  ${state.cuerdas.map(c=>{
+    const grupo = state.gruposCuerda[c];
+    const count = grupo
+      ? state.users.musico.filter(m=>grupo.includes(m.cuerda)).length
+      : state.users.musico.filter(m=>m.cuerda===c).length;
+    return `<div class="card">
+      <div class="row"><h3 style="font-size:14.5px;">${c}</h3><span class="chip blue">${count} músicos</span></div>
+      ${grupo?`<p class="meta" style="margin-top:4px;">Incluye: ${grupo.join(', ')}</p>`:''}
+    </div>`;
+  }).join('')}
   <div class="card">
     <div class="field"><label>Nueva cuerda</label><input id="cuerdaNueva" placeholder="Ej: Percusión Latina"></div>
     <button class="btn-sm solid" onclick="addCuerda()">Añadir cuerda</button>
