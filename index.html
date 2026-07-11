@@ -242,6 +242,53 @@ th{color:var(--ink-soft); font-weight:700; font-size:11.5px; text-transform:uppe
 .chat-input textarea{flex:1; border:1.5px solid var(--line); border-radius:20px; padding:10px 16px; font-size:13.5px; font-family:inherit; resize:none; max-height:120px; overflow-y:auto; line-height:1.4;}
 .chat-input button{width:40px; height:40px; border-radius:50%; border:none; background:var(--vino); color:var(--blanco); font-size:16px;}
 
+.chat-tabs{display:flex; gap:6px; margin-bottom:10px;}
+.chat-tab{padding:7px 14px; border-radius:999px; border:1.5px solid var(--line); background:var(--blanco); font-size:12.5px; font-weight:700; color:var(--ink-soft);}
+.chat-tab.active{background:var(--vino); border-color:var(--vino); color:var(--blanco);}
+.chat-toolbar{display:flex; align-items:center; gap:6px; padding:8px 12px; border-bottom:1px solid var(--line); background:var(--blanco);}
+.chat-search-input{flex:1; border:1.5px solid var(--line); border-radius:14px; padding:7px 12px; font-size:13px;}
+.icon-btn-sm{width:32px; height:32px; border-radius:10px; border:none; background:var(--crema); font-size:15px; flex-shrink:0;}
+.chat-composer-row{display:flex; gap:6px; padding:6px 10px 0;}
+.picker-popover{
+  position:absolute; bottom:40px; left:0; background:var(--blanco); border:1px solid var(--line); border-radius:14px;
+  box-shadow:var(--shadow); padding:8px; z-index:10; display:grid; grid-template-columns:repeat(6,1fr); gap:2px; width:220px;
+}
+.picker-popover button{background:none; border:none; font-size:18px; padding:6px; border-radius:8px;}
+.picker-popover button:hover{background:var(--crema);}
+.mencion-popover{display:flex; flex-direction:column; grid-template-columns:none; width:200px; max-height:200px; overflow-y:auto;}
+.mencion-popover button{font-size:13px; text-align:left; font-weight:600; color:var(--ink);}
+.reply-preview{
+  display:flex; justify-content:space-between; align-items:center; gap:8px; padding:8px 12px; margin:0 10px;
+  background:var(--crema); border-left:3px solid var(--oceano); border-radius:8px; font-size:12.5px;
+}
+.date-sep{display:flex; justify-content:center; margin:10px 0;}
+.date-sep span{background:rgba(35,28,26,0.08); color:var(--ink-soft); font-size:11px; font-weight:700; padding:4px 12px; border-radius:999px;}
+.typing-indicator{align-self:flex-start; font-size:12px; color:var(--ink-soft); font-style:italic; padding:4px 10px;}
+.mention{color:var(--oceano); font-weight:700;}
+.reply-quote{background:rgba(0,0,0,0.06); border-left:3px solid var(--dorado); border-radius:6px; padding:4px 8px; margin-bottom:5px; font-size:12px;}
+.msg.me .reply-quote{background:rgba(255,255,255,0.18); border-left-color:var(--dorado-soft);}
+.file-chip{display:inline-block; background:rgba(0,0,0,0.06); border-radius:8px; padding:6px 10px; font-size:12.5px; margin-bottom:6px; color:inherit; text-decoration:none;}
+.dropzone-pdf{
+  border:2px dashed var(--line); border-radius:14px; padding:16px; text-align:center; transition:.15s; background:var(--crema);
+}
+.dropzone-pdf.drag-over{border-color:var(--oceano); background:rgba(11,85,115,0.08);}
+.file-selected-chip{
+  display:inline-flex; align-items:center; gap:8px; background:rgba(46,140,90,0.14); color:#1f7a4d;
+  font-size:12.5px; font-weight:600; padding:6px 8px 6px 12px; border-radius:999px;
+}
+.file-selected-chip button{
+  background:rgba(31,122,77,0.18); border:none; color:#1f7a4d; width:20px; height:20px; border-radius:50%; font-size:11px; line-height:1;
+}
+.ticks{font-size:11px;}
+.ticks.leido{color:#4FC3F7;}
+.msg{position:relative;}
+.reply-btn{
+  position:absolute; top:2px; right:-26px; background:none; border:none; font-size:13px; color:var(--ink-soft);
+  opacity:0; transition:.15s; cursor:pointer;
+}
+.msg:hover .reply-btn{opacity:1;}
+.msg.me .reply-btn{right:auto; left:-26px;}
+
 .tag-lock{display:inline-flex; align-items:center; gap:4px; font-size:11px; color:var(--ink-soft);}
 
 @media(max-width:400px){
@@ -457,6 +504,13 @@ const state = {
     {id:2, nombre:'Solfeo 1º Iniciación', profesor:'Prof. Alarcón', tipo:'Colectiva', horario:'Mié 18:00'}
   ],
   historialBajas: [],
+
+  partituras: [
+    {id:'p1', categoria:'concierto', cuerda:'Clarinetes', titulo:'Obertura Festiva', autor:'Antonio Ferrer', nombreArchivo:'obertura_festiva.pdf', fecha:Date.now()-20*24*60*60000, subidoPor:'Director Pérez', archivo:'data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PCAvVHlwZSAvQ2F0YWxvZyAvUGFnZXMgMiAwIFIgPj4KZW5kb2JqCjIgMCBvYmoKPDwgL1R5cGUgL1BhZ2VzIC9LaWRzIFszIDAgUl0gL0NvdW50IDEgPj4KZW5kb2JqCjMgMCBvYmoKPDwgL1R5cGUgL1BhZ2UgL1BhcmVudCAyIDAgUiAvUmVzb3VyY2VzIDw8IC9Gb250IDw8IC9GMSA0IDAgUiA+PiA+PiAvTWVkaWFCb3ggWzAgMCA2MTIgNzkyXSAvQ29udGVudHMgNSAwIFIgPj4KZW5kb2JqCjQgMCBvYmoKPDwgL1R5cGUgL0ZvbnQgL1N1YnR5cGUgL1R5cGUxIC9CYXNlRm9udCAvSGVsdmV0aWNhID4+CmVuZG9iago1IDAgb2JqCjw8IC9MZW5ndGggNjAgPj4Kc3RyZWFtCkJUIC9GMSAyNCBUZiA3MiA3MDAgVGQgKE9iZXJ0dXJhIEZlc3RpdmEgLSBDbGFyaW5ldGVzKSBUaiBFVAplbmRzdHJlYW0KZW5kb2JqCnhyZWYKMCA2CjAwMDAwMDAwMDAgNjU1MzUgZiAKMDAwMDAwMDAwOSAwMDAwMCBuIAowMDAwMDAwMDU4IDAwMDAwIG4gCjAwMDAwMDAxMTUgMDAwMDAgbiAKMDAwMDAwMDI0MSAwMDAwMCBuIAowMDAwMDAwMzExIDAwMDAwIG4gCnRyYWlsZXIKPDwgL1NpemUgNiAvUm9vdCAxIDAgUiA+PgpzdGFydHhyZWYKNDIxCiUlRU9G'},
+    {id:'p2', categoria:'procesion', cuerda:'Clarinetes', titulo:'Amarguras', autor:'Enrique López', nombreArchivo:'amarguras.pdf', fecha:Date.now()-12*24*60*60000, subidoPor:'Director Pérez', archivo:'data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PCAvVHlwZSAvQ2F0YWxvZyAvUGFnZXMgMiAwIFIgPj4KZW5kb2JqCjIgMCBvYmoKPDwgL1R5cGUgL1BhZ2VzIC9LaWRzIFszIDAgUl0gL0NvdW50IDEgPj4KZW5kb2JqCjMgMCBvYmoKPDwgL1R5cGUgL1BhZ2UgL1BhcmVudCAyIDAgUiAvUmVzb3VyY2VzIDw8IC9Gb250IDw8IC9GMSA0IDAgUiA+PiA+PiAvTWVkaWFCb3ggWzAgMCA2MTIgNzkyXSAvQ29udGVudHMgNSAwIFIgPj4KZW5kb2JqCjQgMCBvYmoKPDwgL1R5cGUgL0ZvbnQgL1N1YnR5cGUgL1R5cGUxIC9CYXNlRm9udCAvSGVsdmV0aWNhID4+CmVuZG9iago1IDAgb2JqCjw8IC9MZW5ndGggNTMgPj4Kc3RyZWFtCkJUIC9GMSAyNCBUZiA3MiA3MDAgVGQgKEFtYXJndXJhcyAtIENsYXJpbmV0ZXMpIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTggMDAwMDAgbiAKMDAwMDAwMDExNSAwMDAwMCBuIAowMDAwMDAwMjQxIDAwMDAwIG4gCjAwMDAwMDAzMTEgMDAwMDAgbiAKdHJhaWxlcgo8PCAvU2l6ZSA2IC9Sb290IDEgMCBSID4+CnN0YXJ0eHJlZgo0MTQKJSVFT0Y='},
+    {id:'p3', categoria:'pasodobles', cuerda:'Clarinetes', titulo:'Suspiros de España', autor:'Antonio Álvarez', nombreArchivo:'suspiros_de_espana.pdf', fecha:Date.now()-5*24*60*60000, subidoPor:'Director Pérez', archivo:'data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PCAvVHlwZSAvQ2F0YWxvZyAvUGFnZXMgMiAwIFIgPj4KZW5kb2JqCjIgMCBvYmoKPDwgL1R5cGUgL1BhZ2VzIC9LaWRzIFszIDAgUl0gL0NvdW50IDEgPj4KZW5kb2JqCjMgMCBvYmoKPDwgL1R5cGUgL1BhZ2UgL1BhcmVudCAyIDAgUiAvUmVzb3VyY2VzIDw8IC9Gb250IDw8IC9GMSA0IDAgUiA+PiA+PiAvTWVkaWFCb3ggWzAgMCA2MTIgNzkyXSAvQ29udGVudHMgNSAwIFIgPj4KZW5kb2JqCjQgMCBvYmoKPDwgL1R5cGUgL0ZvbnQgL1N1YnR5cGUgL1R5cGUxIC9CYXNlRm9udCAvSGVsdmV0aWNhID4+CmVuZG9iago1IDAgb2JqCjw8IC9MZW5ndGggNjIgPj4Kc3RyZWFtCkJUIC9GMSAyNCBUZiA3MiA3MDAgVGQgKFN1c3Bpcm9zIGRlIEVzcGFuYSAtIENsYXJpbmV0ZXMpIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTggMDAwMDAgbiAKMDAwMDAwMDExNSAwMDAwMCBuIAowMDAwMDAwMjQxIDAwMDAwIG4gCjAwMDAwMDAzMTEgMDAwMDAgbiAKdHJhaWxlcgo8PCAvU2l6ZSA2IC9Sb290IDEgMCBSID4+CnN0YXJ0eHJlZgo0MjMKJSVFT0Y='},
+    {id:'p4', categoria:'concierto', cuerda:'Saxofones', titulo:'Sinfonía de Otoño', autor:'Marta Ibáñez', nombreArchivo:'sinfonia_otono.pdf', fecha:Date.now()-8*24*60*60000, subidoPor:'Director Pérez', archivo:null}
+  ],
   stats: {alumnosTotal:64, musicosActivos:22, profesores:6, asignaturas:9},
 
   encuestas: [
@@ -470,11 +524,16 @@ const state = {
       {from:'them', text:'Hola Ana, recuerda traer la partitura del estudio nº4.', t:'10:02'},
       {from:'me', text:'¡Claro! Ya la tengo lista 🎹', t:'10:05'}
     ],
-    cuerda: [
-      {from:'them', name:'Laura Sánchez', text:'¿Confirmáis asistencia al ensayo del sábado?', t:'09:14'},
-      {from:'them', name:'Javier Ortuño', text:'Yo llego un poco tarde, aviso al llegar.', t:'09:16'},
-      {from:'me', text:'Yo sí, allí estaré.', t:'09:20'}
-    ]
+    cuerda: {
+      'Banda Completa': [
+        {id:'bc1', from:'them', name:'Director Pérez', text:'¡Buen ensayo el de ayer! Recordad traer el repertorio de la Feria la semana que viene.', t:'18:40', ts:Date.now()-2*24*60*60000}
+      ],
+      'Clarinetes': [
+        {id:'cl1', from:'them', name:'Rocío Martínez', text:'¿Confirmáis asistencia al ensayo del sábado?', t:'09:14', ts:Date.now()-3*60*60000},
+        {id:'cl2', from:'them', name:'Rocío Martínez', text:'Yo llego un poco tarde, aviso al llegar.', t:'09:16', ts:Date.now()-2.9*60*60000},
+        {id:'cl3', from:'me', text:'Yo sí, allí estaré.', t:'09:20', ts:Date.now()-2.8*60*60000, estado:'leido'}
+      ]
+    }
   }
 };
 
@@ -569,7 +628,7 @@ document.getElementById('loginBtn').addEventListener('click', ()=>{
 });
 
 document.getElementById('createUserLink').addEventListener('click', ()=>{
-  const cuerdasDisponibles = state.cuerdas.filter(c=>c!=='Viento Madera' && c!=='Viento Metal');
+  const cuerdasDisponibles = cuerdasAsignables();
   openModal(`
     <h3>Crear nuevo usuario</h3>
     <div class="field"><label>Perfil</label>
@@ -657,12 +716,13 @@ const NAV = {
   ],
   musico: [
     {k:'calendario', l:'Ensayos', e:'📅'},
-    {k:'eventos', l:'Eventos', e:'🎤'},
+    {k:'eventos', l:'Actuaciones', e:'🎤'},
     {k:'chatcuerda', l:'Chat cuerda', e:'💬'},
     {k:'asistencia', l:'Asistencia', e:'📍'},
     {k:'ranking', l:'Ranking', e:'🏆'},
     {k:'encuestas', l:'Encuestas', e:'📊'},
     {k:'avisos', l:'Avisos', e:'🔔'},
+    {k:'partiturasmusico', l:'Partituras', e:'🎼'},
     {k:'infomusico', l:'Mi Perfil', e:'👤'}
   ],
   profesor: [
@@ -680,6 +740,7 @@ const NAV = {
     {k:'asistenciadirector', l:'Asistencia', e:'📍'},
     {k:'horariosprofesores', l:'Horarios docentes', e:'🗂️'},
     {k:'encuestasdirector', l:'Encuestas', e:'📊'},
+    {k:'partiturasdirector', l:'Partituras', e:'🎼'},
     {k:'incidenciasdirector', l:'Incidencias', e:'⚠️'}
   ],
   admin: [
@@ -701,6 +762,7 @@ function enterApp(){
   document.getElementById('avatarLetter').innerHTML = avatarHTML(u);
   document.getElementById('topName').textContent = u.name;
   document.getElementById('topRole').textContent = roleLabels[u.role];
+  chatUI = { hilo: u.role==='musico' ? (u.cuerda||'Banda Completa') : 'Banda Completa', buscando:false, query:'', respondiendoA:null, adjunto:null, escribiendo:null };
   buildNav();
   navigate(NAV[u.role][0].k);
   updateNotifBadge();
@@ -757,6 +819,8 @@ function toggleSidebarMobile(){
 }
 
 function navigate(key){
+  const saliendoDeChat = (currentSection==='chatcuerda'||currentSection==='chatdirector') && currentSection!==key;
+  if(saliendoDeChat && typeof limpiarChatTimers==='function') limpiarChatTimers();
   currentSection = key;
   checkEncuestasCaducadas();
   if(window._asistenciaTimer){ clearInterval(window._asistenciaTimer); window._asistenciaTimer = null; }
@@ -768,6 +832,10 @@ function navigate(key){
   wireSectionEvents(key);
   if(key==='asistencia'){
     window._asistenciaTimer = setInterval(()=>{ if(currentSection==='asistencia') navigate('asistencia'); }, 15000);
+  }
+  if(key==='chatcuerda'||key==='chatdirector'||key==='chatprof'){
+    const cm = document.getElementById('chatMsgs');
+    if(cm) cm.scrollTop = cm.scrollHeight;
   }
 }
 
@@ -1006,7 +1074,7 @@ function contarAsistencia(ev){
 }
 
 RENDER.eventos = ()=>`
-  <h2 class="section-title">Próximos eventos / conciertos</h2>
+  <h2 class="section-title">Próximas actuaciones</h2>
   ${state.eventos.filter(e=> Date.now() <= fechaHoraDate(e).getTime() + 60*60000).map(e=>{
     const c = contarAsistencia(e);
     const miEstado = (e.asistencias||{})[state.currentUser.id];
@@ -1021,7 +1089,7 @@ RENDER.eventos = ()=>`
         <button class="btn-sm" onclick="confirmarEvento(${e.id}, false)">No podré ir</button>
       </div>
     </div>`;
-  }).join('') || '<div class="empty"><span class="emoji">🎤</span>No hay eventos próximos por ahora.</div>'}
+  }).join('') || '<div class="empty"><span class="emoji">🎤</span>No hay actuaciones próximas por ahora.</div>'}
 `;
 function confirmarEvento(id, si){
   const ev = state.eventos.find(e=>e.id===id);
@@ -1031,31 +1099,202 @@ function confirmarEvento(id, si){
   navigate('eventos');
 }
 
-RENDER.chatcuerda = ()=>`
-  <h2 class="section-title">Chat por cuerda</h2>
-  <p class="tag-lock">🔒 Conversación cifrada · Cuerda: ${state.currentUser.cuerda||'General'}</p>
-  <div class="chat-window">
-    <div class="chat-msgs" id="chatMsgs">${renderChat('cuerda')}</div>
-    <div class="chat-input"><textarea id="chatInput" rows="1" placeholder="Escribe un mensaje…" onkeydown="return manejarTeclaChat(event,'cuerda')" oninput="autoResizeChatInput(this)"></textarea><button onclick="sendChat('cuerda')">➤</button></div>
-  </div>
-`;
-RENDER.chatprof = ()=>`
-  <h2 class="section-title">Chat con alumnos</h2>
-  <p class="tag-lock">🔒 Conversación cifrada · Ana García</p>
-  <div class="chat-window">
-    <div class="chat-msgs" id="chatMsgs">${renderChat('profAlumno')}</div>
-    <div class="chat-input"><textarea id="chatInput" rows="1" placeholder="Escribe un mensaje…" onkeydown="return manejarTeclaChat(event,'profAlumno')" oninput="autoResizeChatInput(this)"></textarea><button onclick="sendChat('profAlumno')">➤</button></div>
-  </div>
-`;
-RENDER.chatdirector = RENDER.chatcuerda;
+const EMOJIS = ['😀','😂','😍','👍','🙏','🎵','🎶','🎻','🥁','🎷','🎺','🔥','👏','😢','😮','🤔','✅','❌','⏰','📍','🎉','❤️','😅','🙌'];
+const RESPUESTAS_AUTO = [
+  '¡Entendido, gracias por avisar!','Perfecto, allí estaré 🙌','¿A qué hora exactamente?','De acuerdo, lo apunto.','Recibido ✅','¡Genial, nos vemos pronto!'
+];
 
-function renderChat(key){
-  return state.chats[key].map(m=>`<div class="msg ${m.from==='me'?'me':'them'}">${m.from!=='me' && m.name?`<span class="msg-sender">${m.name}</span>`:''}${m.text}<span class="t">${m.t}</span></div>`).join('');
+let chatUI = { hilo:'Banda Completa', buscando:false, query:'', respondiendoA:null, adjunto:null, escribiendo:null };
+let chatTimers = [];
+function limpiarChatTimers(){ chatTimers.forEach(clearTimeout); chatTimers = []; }
+
+function cuerdasAsignables(){ return state.cuerdas.filter(c=>c!=='Viento Madera' && c!=='Viento Metal'); }
+function miembrosDeHilo(hilo){
+  if(hilo==='Banda Completa') return state.musicosBanda;
+  return state.musicosBanda.filter(m=>m.cuerda===hilo);
 }
-function manejarTeclaChat(e, key){
+function hiloMensajes(hilo){
+  if(!state.chats.cuerda[hilo]) state.chats.cuerda[hilo] = [];
+  return state.chats.cuerda[hilo];
+}
+function etiquetaFecha(ts){
+  const d = new Date(ts), hoy = new Date();
+  const mismodia = (a,b)=> a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate();
+  if(mismodia(d,hoy)) return 'Hoy';
+  const ayer = new Date(hoy.getTime()-24*60*60000);
+  if(mismodia(d,ayer)) return 'Ayer';
+  return formatFecha(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`);
+}
+
+RENDER.chatcuerda = ()=>{
+  if(!miembrosDeHilo(chatUI.hilo).some(m=>m.id===state.currentUser.id) && chatUI.hilo!=='Banda Completa'){
+    chatUI.hilo = state.currentUser.cuerda;
+  }
+  const miCuerda = state.currentUser.cuerda;
+  return `
+  <h2 class="section-title">Chat por cuerda</h2>
+  <p class="tag-lock">🔒 Conversación cifrada</p>
+  <div class="chat-tabs">
+    <button class="chat-tab ${chatUI.hilo===miCuerda?'active':''}" onclick="cambiarHiloChat('${miCuerda}')">Mi cuerda (${miCuerda})</button>
+    <button class="chat-tab ${chatUI.hilo==='Banda Completa'?'active':''}" onclick="cambiarHiloChat('Banda Completa')">Banda Completa</button>
+  </div>
+  ${renderVentanaChat()}
+`;};
+
+RENDER.chatdirector = ()=>{
+  const opciones = ['Banda Completa', ...cuerdasAsignables()];
+  return `
+  <h2 class="section-title">Chat</h2>
+  <p class="tag-lock">🔒 Conversación cifrada</p>
+  <div class="field"><label>Enviar a</label>
+    <select onchange="cambiarHiloChat(this.value)">
+      ${opciones.map(o=>`<option value="${o}" ${chatUI.hilo===o?'selected':''}>${o}</option>`).join('')}
+    </select>
+  </div>
+  ${renderVentanaChat()}
+`;};
+
+function cambiarHiloChat(hilo){
+  chatUI.hilo = hilo; chatUI.buscando=false; chatUI.query=''; chatUI.respondiendoA=null; chatUI.adjunto=null;
+  limpiarChatTimers();
+  navigate(currentSection);
+}
+
+function renderVentanaChat(){
+  const hilo = chatUI.hilo;
+  return `
+  <div class="chat-window">
+    <div class="chat-toolbar">
+      ${chatUI.buscando
+        ? `<input id="chatSearch" class="chat-search-input" placeholder="Buscar en la conversación…" value="${chatUI.query}" oninput="buscarEnChat(this.value)" autofocus>
+           <button class="icon-btn-sm" onclick="cerrarBusquedaChat()">✕</button>`
+        : `<span class="meta" style="flex:1;">${hilo}</span><button class="icon-btn-sm" onclick="abrirBusquedaChat()">🔍</button>`}
+    </div>
+    <div class="chat-msgs" id="chatMsgs">${renderChatHilo(hilo)}</div>
+    ${chatUI.respondiendoA?`
+    <div class="reply-preview">
+      <div><b>Respondiendo a ${chatUI.respondiendoA.name}</b><br><span class="meta">${chatUI.respondiendoA.text.slice(0,60)}</span></div>
+      <button class="icon-btn-sm" onclick="cancelarRespuesta()">✕</button>
+    </div>`:''}
+    ${chatUI.adjunto?`
+    <div class="reply-preview">
+      <div>${chatUI.adjunto.type==='image'?`<img src="${chatUI.adjunto.dataUrl}" style="width:34px; height:34px; object-fit:cover; border-radius:8px;">`:'📄'} ${chatUI.adjunto.name}</div>
+      <button class="icon-btn-sm" onclick="quitarAdjunto()">✕</button>
+    </div>`:''}
+    <div class="chat-composer-row">
+      <div style="position:relative;">
+        <button class="icon-btn-sm" onclick="togglePicker('emoji')">😊</button>
+        <div class="picker-popover" id="pickerEmoji" style="display:none;">
+          ${EMOJIS.map(e=>`<button onclick="insertarEnChatInput('${e}')">${e}</button>`).join('')}
+        </div>
+      </div>
+      <div style="position:relative;">
+        <button class="icon-btn-sm" onclick="togglePicker('mencion')">@</button>
+        <div class="picker-popover mencion-popover" id="pickerMencion" style="display:none;">
+          ${miembrosDeHilo(hilo).filter(m=>m.id!==state.currentUser.id).map(m=>`<button onclick="insertarEnChatInput('@${m.name.split(' ')[0]} ')">${m.name}</button>`).join('') || '<span class="meta" style="padding:8px;">Sin otros miembros</span>'}
+        </div>
+      </div>
+      <button class="icon-btn-sm" onclick="document.getElementById('chatFile').click()">📎</button>
+      <input type="file" id="chatFile" accept="image/*,.pdf" style="display:none" onchange="onAdjuntoSeleccionado(event)">
+    </div>
+    <div class="chat-input">
+      <textarea id="chatInput" rows="1" placeholder="Escribe un mensaje…" onkeydown="return manejarTeclaChat(event)" oninput="autoResizeChatInput(this)"></textarea>
+      <button onclick="enviarMensajeCuerda()">➤</button>
+    </div>
+  </div>`;
+}
+
+function renderChatHilo(hilo){
+  let mensajes = hiloMensajes(hilo);
+  if(chatUI.buscando && chatUI.query.trim()){
+    const q = chatUI.query.trim().toLowerCase();
+    const filtrados = mensajes.filter(m=>m.text.toLowerCase().includes(q));
+    if(!filtrados.length) return '<p class="meta" style="text-align:center; padding:20px;">Sin resultados para "'+chatUI.query+'"</p>';
+    return filtrados.map(m=>renderBurbuja(m)).join('');
+  }
+  let out = '', ultimaFecha = null;
+  mensajes.forEach(m=>{
+    const etiqueta = etiquetaFecha(m.ts||Date.now());
+    if(etiqueta!==ultimaFecha){ out += `<div class="date-sep"><span>${etiqueta}</span></div>`; ultimaFecha = etiqueta; }
+    out += renderBurbuja(m);
+  });
+  if(chatUI.escribiendo) out += `<div class="typing-indicator">${chatUI.escribiendo} está escribiendo…</div>`;
+  return out || '<p class="meta" style="text-align:center; padding:20px;">Aún no hay mensajes en esta conversación.</p>';
+}
+
+function resaltarMenciones(text){
+  return text.replace(/@(\w+)/g, '<span class="mention">@$1</span>');
+}
+function renderBurbuja(m){
+  const cita = m.replyTo ? `<div class="reply-quote"><b>${m.replyName}</b><br>${(m.replyText||'').slice(0,60)}</div>` : '';
+  const adjunto = m.attachment ? (
+    m.attachment.type==='image'
+      ? `<a href="${m.attachment.dataUrl}" target="_blank"><img src="${m.attachment.dataUrl}" style="max-width:180px; border-radius:10px; display:block; margin-bottom:6px;"></a>`
+      : `<a href="${m.attachment.dataUrl}" target="_blank" class="file-chip">📄 ${m.attachment.name}</a>`
+  ) : '';
+  const ticks = m.from==='me' ? `<span class="ticks ${m.estado==='leido'?'leido':''}">${m.estado==='enviado'?'✓':'✓✓'}</span>` : '';
+  return `<div class="msg ${m.from==='me'?'me':'them'}">
+    ${m.from!=='me' && m.name?`<span class="msg-sender">${m.name}</span>`:''}
+    ${cita}${adjunto}${resaltarMenciones(m.text)}
+    <span class="t">${m.t} ${ticks}</span>
+    <button class="reply-btn" onclick="iniciarRespuesta('${m.id}')">↩</button>
+  </div>`;
+}
+
+function togglePicker(cual){
+  const map = {emoji:'pickerEmoji', mencion:'pickerMencion'};
+  Object.entries(map).forEach(([k,id])=>{
+    const el = document.getElementById(id);
+    if(!el) return;
+    if(k===cual){
+      const oculto = el.style.display==='none';
+      el.style.display = oculto ? '' : 'none';
+    } else {
+      el.style.display = 'none';
+    }
+  });
+}
+function insertarEnChatInput(text){
+  const inp = document.getElementById('chatInput');
+  const start = inp.selectionStart ?? inp.value.length, end = inp.selectionEnd ?? inp.value.length;
+  inp.value = inp.value.slice(0,start) + text + inp.value.slice(end);
+  const pos = start + text.length;
+  inp.focus(); inp.setSelectionRange(pos,pos);
+  autoResizeChatInput(inp);
+  document.getElementById('pickerEmoji').style.display='none';
+  document.getElementById('pickerMencion').style.display='none';
+}
+function onAdjuntoSeleccionado(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const esImagen = file.type.startsWith('image/');
+  const reader = new FileReader();
+  reader.onload = ev=>{
+    chatUI.adjunto = {type: esImagen?'image':'file', name:file.name, dataUrl:ev.target.result};
+    navigate(currentSection);
+  };
+  reader.readAsDataURL(file);
+}
+function quitarAdjunto(){ chatUI.adjunto=null; navigate(currentSection); }
+function iniciarRespuesta(id){
+  const msg = hiloMensajes(chatUI.hilo).find(m=>m.id===id);
+  if(!msg) return;
+  chatUI.respondiendoA = {id, name: msg.from==='me'?'Ti mismo':msg.name, text: msg.text};
+  navigate(currentSection);
+  document.getElementById('chatInput')?.focus();
+}
+function cancelarRespuesta(){ chatUI.respondiendoA=null; navigate(currentSection); }
+function abrirBusquedaChat(){ chatUI.buscando=true; chatUI.query=''; navigate(currentSection); }
+function cerrarBusquedaChat(){ chatUI.buscando=false; chatUI.query=''; navigate(currentSection); }
+function buscarEnChat(v){
+  chatUI.query = v;
+  document.getElementById('chatMsgs').innerHTML = renderChatHilo(chatUI.hilo);
+}
+
+function manejarTeclaChat(e){
   if(e.key==='Enter' && !e.shiftKey){
     e.preventDefault();
-    sendChat(key);
+    enviarMensajeCuerda();
     return false;
   }
 }
@@ -1063,15 +1302,65 @@ function autoResizeChatInput(el){
   el.style.height='auto';
   el.style.height = Math.min(el.scrollHeight, 120)+'px';
 }
-function sendChat(key){
+
+function enviarMensajeCuerda(){
+  const inp = document.getElementById('chatInput');
+  const text = inp.value.trim();
+  if(!text && !chatUI.adjunto) return;
+  const id = 'm'+Date.now();
+  const msg = {id, from:'me', text, t:'ahora', ts:Date.now(), estado:'enviado'};
+  if(chatUI.respondiendoA){ msg.replyTo=chatUI.respondiendoA.id; msg.replyName=chatUI.respondiendoA.name; msg.replyText=chatUI.respondiendoA.text; }
+  if(chatUI.adjunto){ msg.attachment = chatUI.adjunto; }
+  hiloMensajes(chatUI.hilo).push(msg);
+  chatUI.respondiendoA=null; chatUI.adjunto=null;
+  inp.value=''; inp.style.height='auto';
+  navigate(currentSection);
+
+  const t1 = setTimeout(()=>{ msg.estado='entregado'; if(currentSection==='chatcuerda'||currentSection==='chatdirector') navigate(currentSection); }, 1200);
+  const t2 = setTimeout(()=>{ msg.estado='leido'; if(currentSection==='chatcuerda'||currentSection==='chatdirector') navigate(currentSection); }, 2600);
+  chatTimers.push(t1,t2);
+
+  const otros = miembrosDeHilo(chatUI.hilo).filter(m=>m.id!==state.currentUser.id);
+  if(otros.length){
+    const autor = otros[Math.floor(Math.random()*otros.length)];
+    const hiloAlEnviar = chatUI.hilo;
+    const t3 = setTimeout(()=>{
+      chatUI.escribiendo = autor.name;
+      if(currentSection==='chatcuerda'||currentSection==='chatdirector') navigate(currentSection);
+      const t4 = setTimeout(()=>{
+        chatUI.escribiendo = null;
+        const respuesta = RESPUESTAS_AUTO[Math.floor(Math.random()*RESPUESTAS_AUTO.length)];
+        hiloMensajes(hiloAlEnviar).push({id:'m'+Date.now(), from:'them', name:autor.name, text:respuesta, t:'ahora', ts:Date.now()});
+        if(currentSection==='chatcuerda'||currentSection==='chatdirector') navigate(currentSection);
+      }, 1800);
+      chatTimers.push(t4);
+    }, 900);
+    chatTimers.push(t3);
+  }
+}
+
+RENDER.chatprof = ()=>`
+  <h2 class="section-title">Chat con alumnos</h2>
+  <p class="tag-lock">🔒 Conversación cifrada · Ana García</p>
+  <div class="chat-window">
+    <div class="chat-msgs" id="chatMsgs">${renderChatProf()}</div>
+    <div class="chat-input"><textarea id="chatInput" rows="1" placeholder="Escribe un mensaje…" onkeydown="return manejarTeclaChatProf(event)" oninput="autoResizeChatInput(this)"></textarea><button onclick="sendChatProf()">➤</button></div>
+  </div>
+`;
+function renderChatProf(){
+  return state.chats.profAlumno.map(m=>`<div class="msg ${m.from==='me'?'me':'them'}">${m.text}<span class="t">${m.t}</span></div>`).join('');
+}
+function manejarTeclaChatProf(e){
+  if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); sendChatProf(); return false; }
+}
+function sendChatProf(){
   const inp = document.getElementById('chatInput');
   const text = inp.value.trim();
   if(!text) return;
-  state.chats[key].push({from:'me', text, t:'ahora'});
-  document.getElementById('chatMsgs').innerHTML = renderChat(key);
+  state.chats.profAlumno.push({from:'me', text, t:'ahora'});
+  document.getElementById('chatMsgs').innerHTML = renderChatProf();
   document.getElementById('chatMsgs').scrollTop = 9999;
-  inp.value='';
-  inp.style.height='auto';
+  inp.value=''; inp.style.height='auto';
 }
 
 const PUNTOS = {ensayo:5, concierto:10, pasacalle:15, institucional:5};
@@ -2067,7 +2356,7 @@ function formAltaUsuario(tipo){
     <button class="btn-primary" onclick="altaUsuario('alumno')">Dar de alta</button>`;
   }
   if(tipo==='musico'){
-    const cuerdasDisponibles = state.cuerdas.filter(c=> c!=='Viento Madera' && c!=='Viento Metal');
+    const cuerdasDisponibles = cuerdasAsignables();
     return `<h3>Alta de músico</h3>
     <div class="grid2">
       <div class="field"><label>Nombre</label><input id="altaNombre"></div>
@@ -2181,6 +2470,215 @@ RENDER.estadisticas = ()=>`
     <div class="card"><h3>${state.stats.asignaturas}</h3><p class="meta">Asignaturas</p></div>
   </div>
 `;
+
+/* ---- PARTITURAS ---- */
+const CATEGORIAS_PARTITURAS = [
+  {key:'concierto', label:'Partituras de Concierto', emoji:'🎼'},
+  {key:'procesion', label:'Marchas de Procesión', emoji:'🕯️'},
+  {key:'moras', label:'Marchas Moras/Cristianas', emoji:'⚔️'},
+  {key:'pasodobles', label:'Pasodobles', emoji:'💃'}
+];
+let partiturasUI = { categoria:null, cuerda:null, orden:'fecha' };
+
+function contarPartituras(categoria, cuerda){
+  return state.partituras.filter(p=> p.categoria===categoria && (!cuerda || p.cuerda===cuerda)).length;
+}
+function formatFechaHora(ts){
+  const d = new Date(ts);
+  const meses = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+  return `${d.getDate()} ${meses[d.getMonth()]} ${d.getFullYear()}`;
+}
+function ordenarPartituras(lista){
+  const arr = [...lista];
+  if(partiturasUI.orden==='titulo') arr.sort((a,b)=>a.titulo.localeCompare(b.titulo,'es'));
+  else arr.sort((a,b)=>b.fecha-a.fecha);
+  return arr;
+}
+function renderOrdenSelectorPartituras(){
+  return `
+  <div class="field" style="max-width:260px;">
+    <label>Ordenar por</label>
+    <select onchange="cambiarOrdenPartituras(this.value)">
+      <option value="fecha" ${partiturasUI.orden==='fecha'?'selected':''}>Fecha de subida (más reciente)</option>
+      <option value="titulo" ${partiturasUI.orden==='titulo'?'selected':''}>Título (A-Z)</option>
+    </select>
+  </div>`;
+}
+function cambiarOrdenPartituras(v){ partiturasUI.orden=v; navigate(currentSection); }
+
+function renderTarjetaPartitura(p, esDirector){
+  return `
+  <div class="card">
+    <div class="row">
+      <h3 style="font-size:14.5px;">📄 ${p.titulo}${p.autor?` de ${p.autor}`:''}</h3>
+      ${esDirector?`<span class="chip blue">${p.cuerda}</span>`:''}
+    </div>
+    <p class="meta">Subido el ${formatFechaHora(p.fecha)}${p.subidoPor? ' · '+p.subidoPor:''}</p>
+    ${p.archivo ? `
+    <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+      <a class="btn-sm solid ocean" href="${p.archivo}" target="_blank">Ver PDF</a>
+      <a class="btn-sm" href="${p.archivo}" download="${p.nombreArchivo||p.titulo+'.pdf'}">Descargar</a>
+      ${esDirector?`<button class="btn-sm" style="margin-left:auto;" onclick="eliminarPartitura('${p.id}')">Eliminar</button>`:''}
+    </div>` : `
+    <div style="margin-top:10px; display:flex; gap:8px; align-items:center;">
+      <span class="chip gold" style="background:rgba(227,167,43,.2); color:#8a6413;">Archivo de muestra</span>
+      ${esDirector?`<button class="btn-sm" style="margin-left:auto;" onclick="eliminarPartitura('${p.id}')">Eliminar</button>`:''}
+    </div>`}
+  </div>`;
+}
+
+/* Músico: solo ve/descarga los papeles de su propia cuerda */
+RENDER.partiturasmusico = ()=>{
+  const miCuerda = state.currentUser.cuerda;
+  if(!partiturasUI.categoria){
+    return `
+    <h2 class="section-title">Partituras</h2>
+    <p class="section-sub">Tu cuerda: ${miCuerda}</p>
+    <div class="grid2">
+      ${CATEGORIAS_PARTITURAS.map(c=>{
+        const n = contarPartituras(c.key, miCuerda);
+        return `<div class="card" style="cursor:pointer;" onclick="abrirCategoriaPartiturasMusico('${c.key}')">
+          <h3>${c.emoji} ${c.label}</h3>
+          <p class="meta">${n} archivo${n===1?'':'s'}</p>
+        </div>`;
+      }).join('')}
+    </div>`;
+  }
+  const cat = CATEGORIAS_PARTITURAS.find(c=>c.key===partiturasUI.categoria);
+  const lista = ordenarPartituras(state.partituras.filter(p=>p.categoria===cat.key && p.cuerda===miCuerda));
+  return `
+  <button class="btn-sm" onclick="volverCategoriasPartiturasMusico()">← Volver a Partituras</button>
+  <h2 class="section-title" style="margin-top:10px;">${cat.emoji} ${cat.label}</h2>
+  <p class="section-sub">Tu cuerda: ${miCuerda}</p>
+  ${renderOrdenSelectorPartituras()}
+  ${lista.length? lista.map(p=>renderTarjetaPartitura(p,false)).join('') : '<div class="empty"><span class="emoji">🎼</span>Aún no hay partituras aquí para tu cuerda.</div>'}
+`;};
+function abrirCategoriaPartiturasMusico(key){ partiturasUI.categoria=key; navigate('partiturasmusico'); }
+function volverCategoriasPartiturasMusico(){ partiturasUI.categoria=null; navigate('partiturasmusico'); }
+
+/* Director: sube y elimina archivos por categoría y cuerda */
+RENDER.partiturasdirector = ()=>{
+  if(!partiturasUI.categoria){
+    return `
+    <h2 class="section-title">Partituras</h2>
+    <p class="section-sub">Gestiona los archivos por categoría y cuerda</p>
+    <div class="grid2">
+      ${CATEGORIAS_PARTITURAS.map(c=>{
+        const n = contarPartituras(c.key);
+        return `<div class="card" style="cursor:pointer;" onclick="abrirCategoriaPartiturasDirector('${c.key}')">
+          <h3>${c.emoji} ${c.label}</h3>
+          <p class="meta">${n} archivo${n===1?'':'s'} en total</p>
+        </div>`;
+      }).join('')}
+    </div>`;
+  }
+  const cat = CATEGORIAS_PARTITURAS.find(c=>c.key===partiturasUI.categoria);
+  if(!partiturasUI.cuerda) partiturasUI.cuerda = cuerdasAsignables()[0];
+  const lista = ordenarPartituras(state.partituras.filter(p=>p.categoria===cat.key && p.cuerda===partiturasUI.cuerda));
+  return `
+  <button class="btn-sm" onclick="volverCategoriasPartiturasDirector()">← Volver a Partituras</button>
+  <h2 class="section-title" style="margin-top:10px;">${cat.emoji} ${cat.label}</h2>
+  <div class="field" style="max-width:280px;">
+    <label>Cuerda</label>
+    <select onchange="cambiarCuerdaPartiturasDirector(this.value)">
+      ${cuerdasAsignables().map(c=>`<option value="${c}" ${partiturasUI.cuerda===c?'selected':''}>${c} (${contarPartituras(cat.key,c)})</option>`).join('')}
+    </select>
+  </div>
+  <div class="row" style="align-items:flex-end; gap:10px; flex-wrap:wrap;">
+    ${renderOrdenSelectorPartituras()}
+    <button class="btn-sm solid ocean" onclick="openModal(formSubirPartitura())">+ Subir partitura</button>
+  </div>
+  ${lista.length? lista.map(p=>renderTarjetaPartitura(p,true)).join('') : '<div class="empty"><span class="emoji">🎼</span>Aún no hay partituras aquí para esta cuerda.</div>'}
+`;};
+function abrirCategoriaPartiturasDirector(key){ partiturasUI.categoria=key; partiturasUI.cuerda=null; navigate('partiturasdirector'); }
+function volverCategoriasPartiturasDirector(){ partiturasUI.categoria=null; partiturasUI.cuerda=null; navigate('partiturasdirector'); }
+function cambiarCuerdaPartiturasDirector(v){ partiturasUI.cuerda=v; navigate('partiturasdirector'); }
+
+function formSubirPartitura(){
+  return `<h3>Subir partitura</h3>
+  <div class="field"><label>Categoría</label>
+    <select id="subCategoria">${CATEGORIAS_PARTITURAS.map(c=>`<option value="${c.key}" ${partiturasUI.categoria===c.key?'selected':''}>${c.label}</option>`).join('')}</select>
+  </div>
+  <div class="field"><label>Cuerda</label>
+    <select id="subCuerda">${cuerdasAsignables().map(c=>`<option value="${c}" ${partiturasUI.cuerda===c?'selected':''}>${c}</option>`).join('')}</select>
+  </div>
+  <div class="field"><label>Título</label><input id="subTitulo" placeholder="Ej: Amarguras"></div>
+  <div class="field"><label>Autor</label><input id="subAutor" placeholder="Ej: Antonio Ferrer"></div>
+  <div class="field">
+    <label>Archivo (PDF)</label>
+    <input type="file" id="subArchivo" accept="application/pdf,.pdf" style="display:none" onchange="onArchivoPartituraSeleccionado(this)">
+    <div id="subDropzone" class="dropzone-pdf"
+      ondragover="onDragOverPartitura(event)" ondragleave="onDragLeavePartitura(event)" ondrop="onDropPartitura(event)">
+      <button type="button" class="btn-sm solid ocean" onclick="document.getElementById('subArchivo').click()">📎 Subir Archivo</button>
+      <p class="meta" style="margin-top:8px;">o arrastra aquí tu PDF</p>
+      <div id="subArchivoNombre" style="margin-top:8px;"><span class="meta">Ningún archivo seleccionado.</span></div>
+    </div>
+  </div>
+  <button class="btn-primary" onclick="subirPartitura()">Subir</button>`;
+}
+function renderArchivoSeleccionado(file){
+  const el = document.getElementById('subArchivoNombre');
+  if(!el) return;
+  el.innerHTML = file
+    ? `<span class="file-selected-chip">📄 ${file.name} <button type="button" onclick="quitarArchivoPartitura()">✕</button></span>`
+    : '<span class="meta">Ningún archivo seleccionado.</span>';
+}
+function onArchivoPartituraSeleccionado(input){
+  renderArchivoSeleccionado(input.files[0]);
+}
+function quitarArchivoPartitura(){
+  document.getElementById('subArchivo').value = '';
+  renderArchivoSeleccionado(null);
+}
+function onDragOverPartitura(e){ e.preventDefault(); document.getElementById('subDropzone').classList.add('drag-over'); }
+function onDragLeavePartitura(e){ document.getElementById('subDropzone').classList.remove('drag-over'); }
+function onDropPartitura(e){
+  e.preventDefault();
+  document.getElementById('subDropzone').classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if(!file) return;
+  if(file.type!=='application/pdf' && !file.name.toLowerCase().endsWith('.pdf')){ toast('Solo se admiten archivos PDF.'); return; }
+  const dt = new DataTransfer();
+  dt.items.add(file);
+  document.getElementById('subArchivo').files = dt.files;
+  renderArchivoSeleccionado(file);
+}
+
+function subirPartitura(){
+  const categoria = document.getElementById('subCategoria').value;
+  const cuerda = document.getElementById('subCuerda').value;
+  const titulo = document.getElementById('subTitulo').value.trim();
+  const autor = document.getElementById('subAutor').value.trim();
+  const file = document.getElementById('subArchivo').files[0];
+  if(!titulo || !autor || !file){ toast('Indica título, autor y selecciona un archivo PDF.'); return; }
+  if(file.type!=='application/pdf' && !file.name.toLowerCase().endsWith('.pdf')){ toast('El archivo debe ser un PDF.'); return; }
+  const reader = new FileReader();
+  reader.onload = (ev)=>{
+    state.partituras.push({
+      id:'p'+Date.now(), categoria, cuerda, titulo, autor, nombreArchivo:file.name,
+      fecha:Date.now(), subidoPor:state.currentUser.name, archivo:ev.target.result
+    });
+    partiturasUI.categoria = categoria; partiturasUI.cuerda = cuerda;
+    closeModal();
+    navigate('partiturasdirector');
+    toast('Partitura subida ✅','gold');
+  };
+  reader.readAsDataURL(file);
+}
+function eliminarPartitura(id){
+  openModal(`<h3>Eliminar partitura</h3>
+    <p class="meta">Esta acción no se puede deshacer. ¿Confirmas la eliminación?</p>
+    <div style="display:flex; gap:8px; margin-top:16px;">
+      <button class="btn-sm solid" onclick="confirmarEliminarPartitura('${id}')">Sí, eliminar</button>
+      <button class="btn-sm" onclick="closeModal()">Cancelar</button>
+    </div>`);
+}
+function confirmarEliminarPartitura(id){
+  state.partituras = state.partituras.filter(p=>p.id!==id);
+  closeModal();
+  navigate(currentSection);
+  toast('Partitura eliminada.');
+}
 
 RENDER.cuerdas = ()=>`
   <h2 class="section-title">Gestionar cuerdas</h2>
