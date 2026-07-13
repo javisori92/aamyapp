@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>AAMY · Gestión Escuela de Música</title>
 <style>
 :root{
@@ -24,10 +24,11 @@
   --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
-html,body{height:100%;}
+html{height:100%; -webkit-text-size-adjust:100%; text-size-adjust:100%;}
+html,body{height:100%; overscroll-behavior:none;}
 body{
   margin:0; font-family:var(--font-body); background:var(--crema); color:var(--ink);
-  min-height:100dvh; overflow-x:hidden;
+  height:100dvh; overflow:hidden; overscroll-behavior:none; touch-action:manipulation;
 }
 button{font-family:inherit; cursor:pointer;}
 input,select,textarea{font-family:inherit;}
@@ -36,7 +37,7 @@ input,select,textarea{font-family:inherit;}
 /* ---------- Staff / pentagram motif ---------- */
 .staff{
   width:100%; height:22px; position:relative; margin: 4px 0 14px;
-  opacity:0.55;
+  opacity:0.55; flex-shrink:0;
 }
 .staff::before{
   content:''; position:absolute; inset:0;
@@ -52,7 +53,7 @@ input,select,textarea{font-family:inherit;}
 
 /* ---------- Login ---------- */
 #login-screen{
-  min-height:100dvh; display:flex; align-items:center; justify-content:center;
+  height:100dvh; overflow-y:auto; -webkit-overflow-scrolling:touch; display:flex; align-items:center; justify-content:center;
   background:
     radial-gradient(1200px 600px at 10% -10%, rgba(11,85,115,0.25), transparent 60%),
     radial-gradient(1000px 500px at 110% 110%, rgba(227,167,43,0.20), transparent 60%),
@@ -108,9 +109,9 @@ input,select,textarea{font-family:inherit;}
 .err{color:var(--vino); font-size:12.5px; margin:-4px 0 10px; min-height:14px;}
 
 /* ---------- App shell ---------- */
-#app-screen{display:none; min-height:100dvh; flex-direction:column;}
+#app-screen{display:none; height:100dvh; flex-direction:column; overflow:hidden;}
 .topbar{
-  position:sticky; top:0; z-index:20; display:flex; align-items:center; justify-content:space-between;
+  flex-shrink:0; z-index:20; display:flex; align-items:center; justify-content:space-between;
   padding:14px 18px; background:linear-gradient(120deg, var(--vino-dark), var(--vino));
   color:var(--blanco); box-shadow:0 4px 18px -8px rgba(0,0,0,0.4);
 }
@@ -133,9 +134,10 @@ input,select,textarea{font-family:inherit;}
   font-weight:800; width:17px; height:17px; border-radius:50%; display:flex; align-items:center; justify-content:center;
 }
 
-.layout{flex:1; display:flex; width:100%; max-width:1200px; margin:0 auto;}
+.layout{flex:1; display:flex; width:100%; max-width:1200px; margin:0 auto; min-height:0; overflow:hidden;}
 .sidenav{
   width:230px; padding:20px 12px; display:none; flex-direction:column; gap:4px; border-right:1px solid var(--line);
+  overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain;
 }
 .sidenav.show{display:flex;}
 .sidenav-header{display:none; flex-direction:column; align-items:center; text-align:center; padding-bottom:16px; margin-bottom:10px; border-bottom:1px solid var(--line);}
@@ -150,7 +152,7 @@ input,select,textarea{font-family:inherit;}
 .nav-item:hover{background:rgba(11,85,115,0.07); color:var(--ink);}
 .nav-item.active{background:linear-gradient(120deg, var(--oceano), var(--oceano-light)); color:var(--blanco); box-shadow:var(--shadow);}
 
-.content{flex:1; padding:20px 18px 90px; min-width:0;}
+.content{flex:1; padding:20px 18px 24px; min-width:0; overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain;}
 .section-title{font-family:var(--font-display); font-size:22px; margin:0 0 2px;}
 .section-sub{color:var(--ink-soft); font-size:13px; margin:0 0 8px;}
 
@@ -210,7 +212,7 @@ th{color:var(--ink-soft); font-weight:700; font-size:11.5px; text-transform:uppe
 .modal h3{font-family:var(--font-display); margin-top:0;}
 
 .bottomnav{
-  position:fixed; bottom:0; left:0; right:0; z-index:20; background:var(--blanco); border-top:1px solid var(--line);
+  flex-shrink:0; z-index:20; background:var(--blanco); border-top:1px solid var(--line);
   display:flex; padding:6px 4px calc(6px + env(safe-area-inset-bottom)); box-shadow:0 -6px 20px -10px rgba(0,0,0,0.15);
 }
 .bottomnav.hide{display:none;}
@@ -317,7 +319,7 @@ th{color:var(--ink-soft); font-weight:700; font-size:11.5px; text-transform:uppe
 
 @media(max-width:400px){
   .login-card{padding:28px 20px 22px;}
-  .content{padding:16px 12px 90px;}
+  .content{padding:16px 12px 20px;}
   .card{padding:14px;}
   .chat-window{height:360px;}
 }
@@ -430,6 +432,7 @@ th{color:var(--ink-soft); font-weight:700; font-size:11.5px; text-transform:uppe
 <script>
 if(window.pdfjsLib){ pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'; }
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script>
 /* =========================================================================
    ESTADO EN MEMORIA (simulación — en producción esto vendría de un backend)
@@ -528,11 +531,11 @@ const state = {
     {id:100, nombre:'Concierto de Primavera', lugar:'Auditorio Municipal', fecha:localISO(new Date(_now.getTime()-14*24*60*60000)), hora:'20:00', tipo:'concierto',
       ubicacion:{lat:38.6167, lng:-1.1167, horaRegistro:_now.getTime()-14*24*60*60000},
       checkins:{mu1:{timestamp:0,validado:true}, mu2:{timestamp:0,validado:true}, m3:{timestamp:0,validado:true}, m4:{timestamp:0,validado:true}, m6:{timestamp:0,validado:true}, m7:{timestamp:0,validado:true}, m8:{timestamp:0,validado:true}},
-      asistencias:{mu1:'si', mu2:'si', m3:'si', m4:'si', m5:'no', m6:'si', m7:'si', m8:'si'}},
+      asistencias:{mu1:'si', mu2:'si', m3:'si', m4:'si', m5:'no', m6:'si', m7:'si', m8:'si'}, repertorio:[]},
     {id:1, nombre:'Feria de Yecla - Pasacalle Extraordinario', lugar:'Auditorio Municipal', fecha:localISO(_eventoAInicio), hora:localHora(_eventoAInicio), tipo:'pasacalle', ubicacion:null, checkins:{},
-      asistencias:{mu1:null, mu2:null, m3:'si', m4:null, m5:'no', m6:'si', m7:null, m8:'si'}},
+      asistencias:{mu1:null, mu2:null, m3:'si', m4:null, m5:'no', m6:'si', m7:null, m8:'si'}, repertorio:['o2','o3']},
     {id:2, nombre:'Concierto de Verano', lugar:'Sede AAMY, Sala Principal', fecha:localISO(_eventoBInicio), hora:localHora(_eventoBInicio), tipo:'concierto', ubicacion:null, checkins:{},
-      asistencias:{mu1:null, mu2:null, m3:null, m4:'si', m5:null, m6:null, m7:'si', m8:null}}
+      asistencias:{mu1:null, mu2:null, m3:null, m4:'si', m5:null, m6:null, m7:'si', m8:null}, repertorio:['o1','o4']}
   ],
 
   cuerdas: ['Saxofones','Clarinetes','Flautas','Fagot','Oboe','Violonchelos','Trompas','Trompetas','Trombones','Tubas','Bombardinos','Percusión','Viento Madera','Viento Metal'],
@@ -546,11 +549,24 @@ const state = {
   ],
   historialBajas: [],
 
-  partituras: [
-    {id:'p1', categoria:'concierto', cuerda:'Clarinetes', titulo:'Obertura Festiva', autor:'Antonio Ferrer', nombreArchivo:'obertura_festiva.pdf', fecha:Date.now()-20*24*60*60000, subidoPor:'Director Pérez', archivo:'data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PCAvVHlwZSAvQ2F0YWxvZyAvUGFnZXMgMiAwIFIgPj4KZW5kb2JqCjIgMCBvYmoKPDwgL1R5cGUgL1BhZ2VzIC9LaWRzIFszIDAgUl0gL0NvdW50IDEgPj4KZW5kb2JqCjMgMCBvYmoKPDwgL1R5cGUgL1BhZ2UgL1BhcmVudCAyIDAgUiAvUmVzb3VyY2VzIDw8IC9Gb250IDw8IC9GMSA0IDAgUiA+PiA+PiAvTWVkaWFCb3ggWzAgMCA2MTIgNzkyXSAvQ29udGVudHMgNSAwIFIgPj4KZW5kb2JqCjQgMCBvYmoKPDwgL1R5cGUgL0ZvbnQgL1N1YnR5cGUgL1R5cGUxIC9CYXNlRm9udCAvSGVsdmV0aWNhID4+CmVuZG9iago1IDAgb2JqCjw8IC9MZW5ndGggNjAgPj4Kc3RyZWFtCkJUIC9GMSAyNCBUZiA3MiA3MDAgVGQgKE9iZXJ0dXJhIEZlc3RpdmEgLSBDbGFyaW5ldGVzKSBUaiBFVAplbmRzdHJlYW0KZW5kb2JqCnhyZWYKMCA2CjAwMDAwMDAwMDAgNjU1MzUgZiAKMDAwMDAwMDAwOSAwMDAwMCBuIAowMDAwMDAwMDU4IDAwMDAwIG4gCjAwMDAwMDAxMTUgMDAwMDAgbiAKMDAwMDAwMDI0MSAwMDAwMCBuIAowMDAwMDAwMzExIDAwMDAwIG4gCnRyYWlsZXIKPDwgL1NpemUgNiAvUm9vdCAxIDAgUiA+PgpzdGFydHhyZWYKNDIxCiUlRU9G'},
-    {id:'p2', categoria:'procesion', cuerda:'Clarinetes', titulo:'Amarguras', autor:'Enrique López', nombreArchivo:'amarguras.pdf', fecha:Date.now()-12*24*60*60000, subidoPor:'Director Pérez', archivo:'data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PCAvVHlwZSAvQ2F0YWxvZyAvUGFnZXMgMiAwIFIgPj4KZW5kb2JqCjIgMCBvYmoKPDwgL1R5cGUgL1BhZ2VzIC9LaWRzIFszIDAgUl0gL0NvdW50IDEgPj4KZW5kb2JqCjMgMCBvYmoKPDwgL1R5cGUgL1BhZ2UgL1BhcmVudCAyIDAgUiAvUmVzb3VyY2VzIDw8IC9Gb250IDw8IC9GMSA0IDAgUiA+PiA+PiAvTWVkaWFCb3ggWzAgMCA2MTIgNzkyXSAvQ29udGVudHMgNSAwIFIgPj4KZW5kb2JqCjQgMCBvYmoKPDwgL1R5cGUgL0ZvbnQgL1N1YnR5cGUgL1R5cGUxIC9CYXNlRm9udCAvSGVsdmV0aWNhID4+CmVuZG9iago1IDAgb2JqCjw8IC9MZW5ndGggNTMgPj4Kc3RyZWFtCkJUIC9GMSAyNCBUZiA3MiA3MDAgVGQgKEFtYXJndXJhcyAtIENsYXJpbmV0ZXMpIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTggMDAwMDAgbiAKMDAwMDAwMDExNSAwMDAwMCBuIAowMDAwMDAwMjQxIDAwMDAwIG4gCjAwMDAwMDAzMTEgMDAwMDAgbiAKdHJhaWxlcgo8PCAvU2l6ZSA2IC9Sb290IDEgMCBSID4+CnN0YXJ0eHJlZgo0MTQKJSVFT0Y='},
-    {id:'p3', categoria:'pasodobles', cuerda:'Clarinetes', titulo:'Suspiros de España', autor:'Antonio Álvarez', nombreArchivo:'suspiros_de_espana.pdf', fecha:Date.now()-5*24*60*60000, subidoPor:'Director Pérez', archivo:'data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PCAvVHlwZSAvQ2F0YWxvZyAvUGFnZXMgMiAwIFIgPj4KZW5kb2JqCjIgMCBvYmoKPDwgL1R5cGUgL1BhZ2VzIC9LaWRzIFszIDAgUl0gL0NvdW50IDEgPj4KZW5kb2JqCjMgMCBvYmoKPDwgL1R5cGUgL1BhZ2UgL1BhcmVudCAyIDAgUiAvUmVzb3VyY2VzIDw8IC9Gb250IDw8IC9GMSA0IDAgUiA+PiA+PiAvTWVkaWFCb3ggWzAgMCA2MTIgNzkyXSAvQ29udGVudHMgNSAwIFIgPj4KZW5kb2JqCjQgMCBvYmoKPDwgL1R5cGUgL0ZvbnQgL1N1YnR5cGUgL1R5cGUxIC9CYXNlRm9udCAvSGVsdmV0aWNhID4+CmVuZG9iago1IDAgb2JqCjw8IC9MZW5ndGggNjIgPj4Kc3RyZWFtCkJUIC9GMSAyNCBUZiA3MiA3MDAgVGQgKFN1c3Bpcm9zIGRlIEVzcGFuYSAtIENsYXJpbmV0ZXMpIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTggMDAwMDAgbiAKMDAwMDAwMDExNSAwMDAwMCBuIAowMDAwMDAwMjQxIDAwMDAwIG4gCjAwMDAwMDAzMTEgMDAwMDAgbiAKdHJhaWxlcgo8PCAvU2l6ZSA2IC9Sb290IDEgMCBSID4+CnN0YXJ0eHJlZgo0MjMKJSVFT0Y='},
-    {id:'p4', categoria:'concierto', cuerda:'Saxofones', titulo:'Sinfonía de Otoño', autor:'Marta Ibáñez', nombreArchivo:'sinfonia_otono.pdf', fecha:Date.now()-8*24*60*60000, subidoPor:'Director Pérez', archivo:null}
+  obras: [
+    {id:'o1', categoria:'concierto', titulo:'Obertura Festiva', autor:'Antonio Ferrer', fecha:Date.now()-20*24*60*60000, subidoPor:'Director Pérez',
+      particellas:[
+        {id:'pa1', cuerda:'Clarinetes', voz:null, nombreArchivo:'obertura_festiva.pdf', fecha:Date.now()-20*24*60*60000, archivo:'data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PCAvVHlwZSAvQ2F0YWxvZyAvUGFnZXMgMiAwIFIgPj4KZW5kb2JqCjIgMCBvYmoKPDwgL1R5cGUgL1BhZ2VzIC9LaWRzIFszIDAgUl0gL0NvdW50IDEgPj4KZW5kb2JqCjMgMCBvYmoKPDwgL1R5cGUgL1BhZ2UgL1BhcmVudCAyIDAgUiAvUmVzb3VyY2VzIDw8IC9Gb250IDw8IC9GMSA0IDAgUiA+PiA+PiAvTWVkaWFCb3ggWzAgMCA2MTIgNzkyXSAvQ29udGVudHMgNSAwIFIgPj4KZW5kb2JqCjQgMCBvYmoKPDwgL1R5cGUgL0ZvbnQgL1N1YnR5cGUgL1R5cGUxIC9CYXNlRm9udCAvSGVsdmV0aWNhID4+CmVuZG9iago1IDAgb2JqCjw8IC9MZW5ndGggNjAgPj4Kc3RyZWFtCkJUIC9GMSAyNCBUZiA3MiA3MDAgVGQgKE9iZXJ0dXJhIEZlc3RpdmEgLSBDbGFyaW5ldGVzKSBUaiBFVAplbmRzdHJlYW0KZW5kb2JqCnhyZWYKMCA2CjAwMDAwMDAwMDAgNjU1MzUgZiAKMDAwMDAwMDAwOSAwMDAwMCBuIAowMDAwMDAwMDU4IDAwMDAwIG4gCjAwMDAwMDAxMTUgMDAwMDAgbiAKMDAwMDAwMDI0MSAwMDAwMCBuIAowMDAwMDAwMzExIDAwMDAwIG4gCnRyYWlsZXIKPDwgL1NpemUgNiAvUm9vdCAxIDAgUiA+PgpzdGFydHhyZWYKNDIxCiUlRU9G'}
+      ]},
+    {id:'o2', categoria:'procesion', titulo:'Amarguras', autor:'Enrique López', fecha:Date.now()-12*24*60*60000, subidoPor:'Director Pérez',
+      particellas:[
+        {id:'pa2', cuerda:'Clarinetes', voz:null, nombreArchivo:'amarguras.pdf', fecha:Date.now()-12*24*60*60000, archivo:'data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PCAvVHlwZSAvQ2F0YWxvZyAvUGFnZXMgMiAwIFIgPj4KZW5kb2JqCjIgMCBvYmoKPDwgL1R5cGUgL1BhZ2VzIC9LaWRzIFszIDAgUl0gL0NvdW50IDEgPj4KZW5kb2JqCjMgMCBvYmoKPDwgL1R5cGUgL1BhZ2UgL1BhcmVudCAyIDAgUiAvUmVzb3VyY2VzIDw8IC9Gb250IDw8IC9GMSA0IDAgUiA+PiA+PiAvTWVkaWFCb3ggWzAgMCA2MTIgNzkyXSAvQ29udGVudHMgNSAwIFIgPj4KZW5kb2JqCjQgMCBvYmoKPDwgL1R5cGUgL0ZvbnQgL1N1YnR5cGUgL1R5cGUxIC9CYXNlRm9udCAvSGVsdmV0aWNhID4+CmVuZG9iago1IDAgb2JqCjw8IC9MZW5ndGggNTMgPj4Kc3RyZWFtCkJUIC9GMSAyNCBUZiA3MiA3MDAgVGQgKEFtYXJndXJhcyAtIENsYXJpbmV0ZXMpIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTggMDAwMDAgbiAKMDAwMDAwMDExNSAwMDAwMCBuIAowMDAwMDAwMjQxIDAwMDAwIG4gCjAwMDAwMDAzMTEgMDAwMDAgbiAKdHJhaWxlcgo8PCAvU2l6ZSA2IC9Sb290IDEgMCBSID4+CnN0YXJ0eHJlZgo0MTQKJSVFT0Y='}
+      ]},
+    {id:'o3', categoria:'pasodobles', titulo:'Suspiros de España', autor:'Antonio Álvarez', fecha:Date.now()-5*24*60*60000, subidoPor:'Director Pérez',
+      particellas:[
+        {id:'pa3', cuerda:'Clarinetes', voz:null, nombreArchivo:'suspiros_de_espana.pdf', fecha:Date.now()-5*24*60*60000, archivo:'data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PCAvVHlwZSAvQ2F0YWxvZyAvUGFnZXMgMiAwIFIgPj4KZW5kb2JqCjIgMCBvYmoKPDwgL1R5cGUgL1BhZ2VzIC9LaWRzIFszIDAgUl0gL0NvdW50IDEgPj4KZW5kb2JqCjMgMCBvYmoKPDwgL1R5cGUgL1BhZ2UgL1BhcmVudCAyIDAgUiAvUmVzb3VyY2VzIDw8IC9Gb250IDw8IC9GMSA0IDAgUiA+PiA+PiAvTWVkaWFCb3ggWzAgMCA2MTIgNzkyXSAvQ29udGVudHMgNSAwIFIgPj4KZW5kb2JqCjQgMCBvYmoKPDwgL1R5cGUgL0ZvbnQgL1N1YnR5cGUgL1R5cGUxIC9CYXNlRm9udCAvSGVsdmV0aWNhID4+CmVuZG9iago1IDAgb2JqCjw8IC9MZW5ndGggNjIgPj4Kc3RyZWFtCkJUIC9GMSAyNCBUZiA3MiA3MDAgVGQgKFN1c3Bpcm9zIGRlIEVzcGFuYSAtIENsYXJpbmV0ZXMpIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTggMDAwMDAgbiAKMDAwMDAwMDExNSAwMDAwMCBuIAowMDAwMDAwMjQxIDAwMDAwIG4gCjAwMDAwMDAzMTEgMDAwMDAgbiAKdHJhaWxlcgo8PCAvU2l6ZSA2IC9Sb290IDEgMCBSID4+CnN0YXJ0eHJlZgo0MjMKJSVFT0Y='}
+      ]},
+    {id:'o4', categoria:'concierto', titulo:'Sinfonía de Otoño', autor:'Marta Ibáñez', fecha:Date.now()-8*24*60*60000, subidoPor:'Director Pérez',
+      particellas:[
+        {id:'pa4', cuerda:'Saxofones', voz:'Saxofón 1', nombreArchivo:'sinfonia_otono_sax1.pdf', fecha:Date.now()-8*24*60*60000, archivo:null},
+        {id:'pa5', cuerda:'Saxofones', voz:'Saxofón 2', nombreArchivo:'sinfonia_otono_sax2.pdf', fecha:Date.now()-8*24*60*60000, archivo:null}
+      ]}
   ],
   stats: {alumnosTotal:64, musicosActivos:22, profesores:6, asignaturas:9},
 
@@ -963,10 +979,45 @@ function selectorDuracion(prefix){
   </div>`;
 }
 
+function proximoEnsayoPara(cuerda){
+  const ahora = Date.now();
+  const candidatos = state.ensayos
+    .filter(e=> perteneceAEnsayo(e, cuerda) && fechaHoraDate(e).getTime() >= ahora)
+    .sort((a,b)=> fechaHoraDate(a).getTime() - fechaHoraDate(b).getTime());
+  return candidatos[0] || null;
+}
+function proximaActuacionPara(){
+  const ahora = Date.now();
+  const candidatos = state.eventos
+    .filter(e=> fechaHoraDate(e).getTime() >= ahora)
+    .sort((a,b)=> fechaHoraDate(a).getTime() - fechaHoraDate(b).getTime());
+  return candidatos[0] || null;
+}
+
 RENDER.avisos = ()=>{
   const rel = state.avisos.filter(a=> (a.para==='todos' || a.para===state.currentUser.role) && !haExpirado(a));
+  let resumenMusico = '';
+  if(state.currentUser.role==='musico'){
+    const pe = proximoEnsayoPara(state.currentUser.cuerda);
+    const pa = proximaActuacionPara();
+    if(pe || pa){
+      resumenMusico = `<div class="grid2" style="margin-bottom:16px;">
+        ${pe? `<div class="card" style="border:2px solid var(--dorado); box-shadow:0 6px 20px -8px rgba(227,167,43,.4);">
+          <span class="chip gold" style="background:rgba(227,167,43,.3); color:#8a6413;">⭐ Próximo ensayo</span>
+          <h3 style="margin-top:8px;">${formatEnsayoFecha(pe.fecha)} · ${pe.hora}</h3>
+          <p class="meta">📍 ${pe.lugar}</p>
+        </div>` : ''}
+        ${pa? `<div class="card" style="border:2px solid var(--dorado); box-shadow:0 6px 20px -8px rgba(227,167,43,.4);">
+          <span class="chip gold" style="background:rgba(227,167,43,.3); color:#8a6413;">⭐ Próxima actuación</span>
+          <h3 style="margin-top:8px;">${pa.nombre}</h3>
+          <p class="meta">📍 ${pa.lugar} · ${formatFecha(pa.fecha)} · ${pa.hora}</p>
+        </div>` : ''}
+      </div>`;
+    }
+  }
   return `
     <h2 class="section-title">Avisos</h2><p class="section-sub">Comunicaciones del centro</p>
+    ${resumenMusico}
     ${rel.map(a=>`
       <div class="card">
         <div class="row"><h3>${a.titulo}</h3>${a.tipo==='Urgente'?'<span class="chip red">Urgente</span>':`<span class="chip blue">${a.tipo||'Info'}</span>`}</div>
@@ -1084,16 +1135,23 @@ RENDER.calendario = ()=>{
   const relevantes = state.ensayos.filter(e=>{
     const perteneceCuerda = perteneceAEnsayo(e, miCuerda);
     if(!perteneceCuerda) return false;
-    return ahora <= fechaHoraDate(e).getTime() + 60*60000;
+    return fechaHoraDate(e).getTime() >= ahora;
   }).sort((a,b)=> fechaHoraDate(a).getTime() - fechaHoraDate(b).getTime());
+  const proximo = relevantes[0];
   return `
   <h2 class="section-title">Calendario de ensayos</h2>
   <p class="section-sub">Tu cuerda: ${miCuerda||'—'}</p>
   ${relevantes.map(e=>{
     const esTodos = !e.cuerdas || e.cuerdas[0]==='todos';
+    const esProximo = proximo && e.id===proximo.id;
     return `
-    <div class="card"><div class="row"><h3>${formatEnsayoFecha(e.fecha)} · ${e.hora}</h3><span class="chip ${esTodos?'blue':'gold'}" style="${esTodos?'':'background:rgba(227,167,43,.2); color:#8a6413;'}">${esTodos? 'Banda Completa' : e.cuerdas.join(', ')}</span></div>
-    <p class="meta">📍 ${e.lugar}</p></div>`;
+    <div class="card" style="${esProximo?'border:2px solid var(--dorado); box-shadow:0 6px 20px -8px rgba(227,167,43,.4);':''}">
+      ${esProximo?'<span class="chip gold" style="background:rgba(227,167,43,.3); color:#8a6413; display:inline-block; margin-bottom:8px;">⭐ Próximo ensayo</span>':''}
+      <div class="row">
+        <h3>${formatEnsayoFecha(e.fecha)} · ${e.hora}</h3>
+        <span class="chip ${esTodos?'blue':'gold'}" style="${esTodos?'':'background:rgba(227,167,43,.2); color:#8a6413;'}">${esTodos? 'Banda Completa' : e.cuerdas.join(', ')}</span>
+      </div>
+      <p class="meta">📍 ${e.lugar}</p></div>`;
   }).join('') || '<div class="empty"><span class="emoji">📅</span>No tienes ensayos programados por ahora.</div>'}
 `;};
 
@@ -1125,9 +1183,15 @@ RENDER.eventos = ()=>`
       <p class="meta">📍 ${e.lugar} · ${formatFecha(e.fecha)} · ${e.hora}</p>
       <p class="meta">✅ ${c.si} van · ❌ ${c.no} no van · ⏳ ${c.pendiente} sin responder</p>
       ${miEstado? `<p style="margin-top:6px;"><span class="chip ${miEstado==='si'?'green':'red'}">${miEstado==='si'?'Has confirmado asistencia':'Has indicado que no vas'}</span></p>`:''}
-      <div style="margin-top:10px; display:flex; gap:8px;">
-        <button class="btn-sm solid" onclick="confirmarEvento(${e.id}, true)">Asistiré</button>
-        <button class="btn-sm" onclick="confirmarEvento(${e.id}, false)">No podré ir</button>
+      <div style="margin-top:10px; display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap;">
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button class="btn-sm solid" onclick="confirmarEvento(${e.id}, true)">Asistiré</button>
+          <button class="btn-sm" onclick="confirmarEvento(${e.id}, false)">No podré ir</button>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button class="btn-sm solid ocean" onclick="verRepertorio(${e.id})">🎼 Ver repertorio</button>
+          <button class="btn-sm" onclick="descargarRepertorio(${e.id})">⬇ Descargar repertorio</button>
+        </div>
       </div>
     </div>`;
   }).join('') || '<div class="empty"><span class="emoji">🎤</span>No hay actuaciones próximas por ahora.</div>'}
@@ -2136,8 +2200,9 @@ RENDER.calendariodirector = RENDER.calendarioadmin = ()=>{
     const esTodos = !e.cuerdas || e.cuerdas[0]==='todos';
     return `
     <div class="card" style="${esProximo?'border:2px solid var(--dorado); box-shadow:0 6px 20px -8px rgba(227,167,43,.4);':''}">
+      ${esProximo?'<span class="chip gold" style="background:rgba(227,167,43,.3); color:#8a6413; display:inline-block; margin-bottom:8px;">⭐ Próximo ensayo</span>':''}
       <div class="row">
-        <h3>${formatEnsayoFecha(e.fecha)} · ${e.hora} ${esProximo?'<span class="chip gold" style="background:rgba(227,167,43,.3); color:#8a6413; margin-left:6px;">⭐ Próximo ensayo</span>':''}</h3>
+        <h3>${formatEnsayoFecha(e.fecha)} · ${e.hora}</h3>
         <span class="chip ${esTodos?'blue':'gold'}" style="${esTodos?'':'background:rgba(227,167,43,.2); color:#8a6413;'}">${esTodos?'Banda Completa':e.cuerdas.join(', ')}</span>
       </div>
       <p class="meta" style="margin-top:6px;">📍 ${e.lugar}</p>
@@ -2266,6 +2331,7 @@ RENDER.actuaciones = ()=>`
       <div style="margin-top:8px; display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap;" onclick="event.stopPropagation()">
         ${botonUbicacion('actuacion', e)}
         <div style="display:flex; gap:6px;">
+          <button class="btn-sm" onclick="openModal(formRepertorio(${e.id}))">🎼 Repertorio</button>
           <button class="btn-sm" onclick="openModal(formActuacion(${e.id}))">Editar</button>
           <button class="btn-sm" onclick="eliminarActuacion(${e.id})">Eliminar</button>
         </div>
@@ -2306,7 +2372,7 @@ function guardarActuacion(id){
   } else {
     const asistencias = {};
     state.musicosBanda.forEach(m=> asistencias[m.id] = null);
-    state.eventos.push({id:Date.now(), nombre, tipo, lugar, fecha, hora, asistencias, ubicacion:null, checkins:{}});
+    state.eventos.push({id:Date.now(), nombre, tipo, lugar, fecha, hora, asistencias, ubicacion:null, checkins:{}, repertorio:[]});
     toast('Actuación creada ✅','gold');
   }
   closeModal(); navigate('actuaciones');
@@ -2512,24 +2578,25 @@ RENDER.estadisticas = ()=>`
   </div>
 `;
 
-/* ---- PARTITURAS ---- */
+/* ---- PARTITURAS (Obra general -> Particellas por cuerda/voz) ---- */
 const CATEGORIAS_PARTITURAS = [
   {key:'concierto', label:'Partituras de Concierto', emoji:'🎼'},
   {key:'procesion', label:'Marchas de Procesión', emoji:'🕯️'},
   {key:'moras', label:'Marchas Moras/Cristianas', emoji:'⚔️'},
   {key:'pasodobles', label:'Pasodobles', emoji:'💃'}
 ];
-let partiturasUI = { categoria:null, cuerda:null, orden:'fecha' };
+let partiturasUI = { categoria:null, obra:null, orden:'fecha' };
 
-function contarPartituras(categoria, cuerda){
-  return state.partituras.filter(p=> p.categoria===categoria && (!cuerda || p.cuerda===cuerda)).length;
+function contarObras(categoria){ return state.obras.filter(o=>o.categoria===categoria).length; }
+function contarObrasParaCuerda(categoria, cuerda){
+  return state.obras.filter(o=> o.categoria===categoria && o.particellas.some(pa=>pa.cuerda===cuerda)).length;
 }
 function formatFechaHora(ts){
   const d = new Date(ts);
   const meses = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
   return `${d.getDate()} ${meses[d.getMonth()]} ${d.getFullYear()}`;
 }
-function ordenarPartituras(lista){
+function ordenarObras(lista){
   const arr = [...lista];
   if(partiturasUI.orden==='titulo') arr.sort((a,b)=>a.titulo.localeCompare(b.titulo,'es'));
   else arr.sort((a,b)=>b.fecha-a.fecha);
@@ -2547,30 +2614,7 @@ function renderOrdenSelectorPartituras(){
 }
 function cambiarOrdenPartituras(v){ partiturasUI.orden=v; navigate(currentSection); }
 
-function renderTarjetaPartitura(p, esDirector){
-  return `
-  <div class="card">
-    <div class="row">
-      <h3 style="font-size:14.5px;">📄 ${p.titulo}${p.autor?` de ${p.autor}`:''}</h3>
-      ${esDirector?`<span class="chip blue">${p.cuerda}</span>`:''}
-    </div>
-    <p class="meta">Subido el ${formatFechaHora(p.fecha)}${p.subidoPor? ' · '+p.subidoPor:''}</p>
-    <div style="margin-top:10px; display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap;">
-      <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
-        ${p.archivo ? `
-          <button class="btn-sm solid ocean" onclick="abrirVisorPDF('${p.id}')">Ver PDF</button>
-          <a class="btn-sm" href="${p.archivo}" download="${p.nombreArchivo||p.titulo+'.pdf'}">Descargar</a>
-        ` : `<span class="chip gold" style="background:rgba(227,167,43,.2); color:#8a6413;">Archivo de muestra</span>`}
-      </div>
-      ${esDirector?`<div style="display:flex; gap:6px;">
-        <button class="btn-sm" onclick="openModal(formEditarPartitura('${p.id}'))">Editar</button>
-        <button class="btn-sm" onclick="eliminarPartitura('${p.id}')">Eliminar</button>
-      </div>`:''}
-    </div>
-  </div>`;
-}
-
-/* Músico: solo ve/descarga los papeles de su propia cuerda */
+/* ---------- MÚSICO: solo ve/descarga los papeles de su propia cuerda ---------- */
 RENDER.partiturasmusico = ()=>{
   const miCuerda = state.currentUser.cuerda;
   if(!partiturasUI.categoria){
@@ -2579,197 +2623,284 @@ RENDER.partiturasmusico = ()=>{
     <p class="section-sub">Tu cuerda: ${miCuerda}</p>
     <div class="grid2">
       ${CATEGORIAS_PARTITURAS.map(c=>{
-        const n = contarPartituras(c.key, miCuerda);
+        const n = contarObrasParaCuerda(c.key, miCuerda);
         return `<div class="card" style="cursor:pointer;" onclick="abrirCategoriaPartiturasMusico('${c.key}')">
           <h3>${c.emoji} ${c.label}</h3>
-          <p class="meta">${n} archivo${n===1?'':'s'}</p>
+          <p class="meta">${n} obra${n===1?'':'s'}</p>
         </div>`;
       }).join('')}
     </div>`;
   }
   const cat = CATEGORIAS_PARTITURAS.find(c=>c.key===partiturasUI.categoria);
-  const lista = ordenarPartituras(state.partituras.filter(p=>p.categoria===cat.key && p.cuerda===miCuerda));
+  const obras = ordenarObras(state.obras.filter(o=>o.categoria===cat.key && o.particellas.some(pa=>pa.cuerda===miCuerda)));
   return `
   <button class="btn-sm" onclick="volverCategoriasPartiturasMusico()">← Volver a Partituras</button>
   <h2 class="section-title" style="margin-top:10px;">${cat.emoji} ${cat.label}</h2>
   <p class="section-sub">Tu cuerda: ${miCuerda}</p>
   ${renderOrdenSelectorPartituras()}
-  ${lista.length? lista.map(p=>renderTarjetaPartitura(p,false)).join('') : '<div class="empty"><span class="emoji">🎼</span>Aún no hay partituras aquí para tu cuerda.</div>'}
+  ${obras.length? obras.map(o=>renderObraMusico(o, miCuerda)).join('') : '<div class="empty"><span class="emoji">🎼</span>Aún no hay partituras aquí para tu cuerda.</div>'}
 `;};
 function abrirCategoriaPartiturasMusico(key){ partiturasUI.categoria=key; navigate('partiturasmusico'); }
 function volverCategoriasPartiturasMusico(){ partiturasUI.categoria=null; navigate('partiturasmusico'); }
 
-/* Director: sube y elimina archivos por categoría y cuerda */
+function renderObraMusico(obra, miCuerda){
+  const partes = obra.particellas.filter(pa=>pa.cuerda===miCuerda);
+  return `
+  <div class="card">
+    <h3 style="font-size:14.5px;">📄 ${obra.titulo}${obra.autor?` de ${obra.autor}`:''}</h3>
+    <p class="meta">Subido el ${formatFechaHora(obra.fecha)}</p>
+    <div style="margin-top:10px; display:flex; flex-direction:column; gap:8px;">
+      ${partes.map(pa=>`
+        <div class="row" style="background:var(--crema); border-radius:10px; padding:8px 12px; flex-wrap:wrap; gap:8px;">
+          <span style="font-size:13px; font-weight:600;">${pa.voz || 'Todas las voces'}</span>
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            ${pa.archivo? `
+              <button class="btn-sm solid ocean" onclick="abrirVisorPDFParticella('${obra.id}','${pa.id}')">Ver</button>
+              <a class="btn-sm" href="${pa.archivo}" download="${pa.nombreArchivo}">Descargar</a>
+            ` : `<span class="chip gold" style="background:rgba(227,167,43,.2); color:#8a6413;">Muestra</span>`}
+          </div>
+        </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+/* ---------- DIRECTOR: obras -> particellas por cuerda/voz ---------- */
 RENDER.partiturasdirector = ()=>{
   if(!partiturasUI.categoria){
     return `
     <h2 class="section-title">Partituras</h2>
-    <p class="section-sub">Gestiona los archivos por categoría y cuerda</p>
+    <p class="section-sub">Gestiona las obras, sus particellas y el repertorio</p>
+    <button class="btn-sm solid ocean" style="margin-bottom:14px;" onclick="openModal(formNuevaObra())">+ Nueva obra</button>
     <div class="grid2">
       ${CATEGORIAS_PARTITURAS.map(c=>{
-        const n = contarPartituras(c.key);
+        const n = contarObras(c.key);
         return `<div class="card" style="cursor:pointer;" onclick="abrirCategoriaPartiturasDirector('${c.key}')">
           <h3>${c.emoji} ${c.label}</h3>
-          <p class="meta">${n} archivo${n===1?'':'s'} en total</p>
+          <p class="meta">${n} obra${n===1?'':'s'}</p>
         </div>`;
       }).join('')}
     </div>`;
   }
   const cat = CATEGORIAS_PARTITURAS.find(c=>c.key===partiturasUI.categoria);
-  if(!partiturasUI.cuerda) partiturasUI.cuerda = cuerdasAsignables()[0];
-  const lista = ordenarPartituras(state.partituras.filter(p=>p.categoria===cat.key && p.cuerda===partiturasUI.cuerda));
+  if(partiturasUI.obra) return renderDetalleObraDirector();
+  const obras = ordenarObras(state.obras.filter(o=>o.categoria===cat.key));
   return `
   <button class="btn-sm" onclick="volverCategoriasPartiturasDirector()">← Volver a Partituras</button>
   <h2 class="section-title" style="margin-top:10px;">${cat.emoji} ${cat.label}</h2>
   <div class="row" style="align-items:flex-end; gap:14px; flex-wrap:wrap;">
-    <div class="field" style="max-width:280px; flex:1; min-width:200px;">
-      <label>Cuerda</label>
-      <select onchange="cambiarCuerdaPartiturasDirector(this.value)">
-        ${cuerdasAsignables().map(c=>`<option value="${c}" ${partiturasUI.cuerda===c?'selected':''}>${c} (${contarPartituras(cat.key,c)})</option>`).join('')}
-      </select>
-    </div>
     ${renderOrdenSelectorPartituras()}
   </div>
-  <button class="btn-sm solid ocean" style="margin:14px 0 4px;" onclick="openModal(formSubirPartitura())">+ Subir partitura</button>
-  ${lista.length? lista.map(p=>renderTarjetaPartitura(p,true)).join('') : '<div class="empty"><span class="emoji">🎼</span>Aún no hay partituras aquí para esta cuerda.</div>'}
+  ${obras.length? obras.map(o=>renderTarjetaObraDirector(o)).join('') : '<div class="empty"><span class="emoji">🎼</span>Aún no hay obras en esta categoría.</div>'}
 `;};
-function abrirCategoriaPartiturasDirector(key){ partiturasUI.categoria=key; partiturasUI.cuerda=null; navigate('partiturasdirector'); }
-function volverCategoriasPartiturasDirector(){ partiturasUI.categoria=null; partiturasUI.cuerda=null; navigate('partiturasdirector'); }
-function cambiarCuerdaPartiturasDirector(v){ partiturasUI.cuerda=v; navigate('partiturasdirector'); }
+function abrirCategoriaPartiturasDirector(key){ partiturasUI.categoria=key; partiturasUI.obra=null; navigate('partiturasdirector'); }
+function volverCategoriasPartiturasDirector(){ partiturasUI.categoria=null; partiturasUI.obra=null; navigate('partiturasdirector'); }
+function abrirObraPartiturasDirector(id){ partiturasUI.obra=id; navigate('partiturasdirector'); }
+function volverObraPartiturasDirector(){ partiturasUI.obra=null; navigate('partiturasdirector'); }
 
-let archivosPendientesPartitura = [];
+function renderTarjetaObraDirector(o){
+  const cuerdas = Array.from(new Set(o.particellas.map(pa=>pa.cuerda)));
+  return `
+  <div class="card" style="cursor:pointer;" onclick="abrirObraPartiturasDirector('${o.id}')">
+    <div class="row">
+      <h3 style="font-size:14.5px;">${o.titulo}${o.autor?` de ${o.autor}`:''}</h3>
+      <span class="meta">${o.particellas.length} archivo${o.particellas.length===1?'':'s'} →</span>
+    </div>
+    <p class="meta" style="margin-top:6px;">${cuerdas.length? cuerdas.join(', ') : 'Sin particellas todavía'}</p>
+  </div>`;
+}
 
-function formSubirPartitura(){
-  archivosPendientesPartitura = [];
-  return `<h3>Subir partituras</h3>
+function renderDetalleObraDirector(){
+  const obra = state.obras.find(o=>o.id===partiturasUI.obra);
+  if(!obra){ partiturasUI.obra=null; return RENDER.partiturasdirector(); }
+  const cat = CATEGORIAS_PARTITURAS.find(c=>c.key===obra.categoria);
+  const porCuerda = {};
+  obra.particellas.forEach(pa=>{ (porCuerda[pa.cuerda] = porCuerda[pa.cuerda]||[]).push(pa); });
+  return `
+  <button class="btn-sm" onclick="volverObraPartiturasDirector()">← Volver a ${cat.label}</button>
+  <div class="row" style="margin-top:10px; align-items:flex-start; flex-wrap:wrap; gap:10px;">
+    <h2 class="section-title" style="margin:0;">${obra.titulo}${obra.autor?` de ${obra.autor}`:''}</h2>
+    <div style="display:flex; gap:6px;">
+      <button class="btn-sm" onclick="openModal(formEditarObra('${obra.id}'))">Editar obra</button>
+      <button class="btn-sm" onclick="eliminarObra('${obra.id}')">Eliminar obra</button>
+    </div>
+  </div>
+  <p class="section-sub">Subida el ${formatFechaHora(obra.fecha)}${obra.subidoPor?' · '+obra.subidoPor:''}</p>
+  <button class="btn-sm solid ocean" style="margin:14px 0 4px;" onclick="openModal(formAnadirParticella('${obra.id}'))">+ Añadir particella</button>
+  ${Object.keys(porCuerda).length ? Object.entries(porCuerda).map(([cuerda, partes])=>`
+    <div class="card">
+      <h3 style="font-size:14px;">${cuerda}</h3>
+      <div style="margin-top:8px; display:flex; flex-direction:column; gap:8px;">
+        ${partes.map(pa=>`
+          <div class="row" style="background:var(--crema); border-radius:10px; padding:8px 12px; flex-wrap:wrap; gap:8px;">
+            <span style="font-size:13px; font-weight:600;">${pa.voz || 'Todas las voces'}</span>
+            <div style="display:flex; gap:6px; flex-wrap:wrap;">
+              ${pa.archivo? `
+                <button class="btn-sm solid ocean" onclick="abrirVisorPDFParticella('${obra.id}','${pa.id}')">Ver</button>
+                <a class="btn-sm" href="${pa.archivo}" download="${pa.nombreArchivo}">Descargar</a>
+              ` : `<span class="chip gold" style="background:rgba(227,167,43,.2); color:#8a6413;">Muestra</span>`}
+              <button class="btn-sm" onclick="eliminarParticella('${obra.id}','${pa.id}')">Eliminar</button>
+            </div>
+          </div>`).join('')}
+      </div>
+    </div>`).join('') : '<div class="empty"><span class="emoji">📄</span>Aún no hay particellas subidas para esta obra.</div>'}
+`;}
+
+function formNuevaObra(){
+  return `<h3>Nueva obra</h3>
   <div class="field"><label>Categoría</label>
-    <select id="subCategoria">${CATEGORIAS_PARTITURAS.map(c=>`<option value="${c.key}" ${partiturasUI.categoria===c.key?'selected':''}>${c.label}</option>`).join('')}</select>
+    <select id="obCategoria">${CATEGORIAS_PARTITURAS.map(c=>`<option value="${c.key}" ${partiturasUI.categoria===c.key?'selected':''}>${c.label}</option>`).join('')}</select>
   </div>
+  <div class="field"><label>Título</label><input id="obTitulo" placeholder="Ej: Sinfonía de Otoño"></div>
+  <div class="field"><label>Autor</label><input id="obAutor" placeholder="Ej: Marta Ibáñez"></div>
+  <button class="btn-primary" onclick="crearObra()">Crear obra</button>`;
+}
+function crearObra(){
+  const categoria = document.getElementById('obCategoria').value;
+  const titulo = document.getElementById('obTitulo').value.trim();
+  const autor = document.getElementById('obAutor').value.trim();
+  if(!titulo || !autor){ toast('Indica título y autor.'); return; }
+  const obra = {id:'o'+Date.now(), categoria, titulo, autor, fecha:Date.now(), subidoPor:state.currentUser.name, particellas:[]};
+  state.obras.push(obra);
+  partiturasUI.categoria = categoria;
+  partiturasUI.obra = obra.id;
+  closeModal();
+  navigate('partiturasdirector');
+  toast('Obra creada ✅. Ahora añade sus particellas.','gold');
+}
+function formEditarObra(id){
+  const o = state.obras.find(x=>x.id===id);
+  return `<h3>Editar obra</h3>
+  <div class="field"><label>Título</label><input id="obEditTitulo" value="${o.titulo}"></div>
+  <div class="field"><label>Autor</label><input id="obEditAutor" value="${o.autor||''}"></div>
+  <button class="btn-primary" onclick="guardarEdicionObra('${id}')">Guardar cambios</button>`;
+}
+function guardarEdicionObra(id){
+  const titulo = document.getElementById('obEditTitulo').value.trim();
+  const autor = document.getElementById('obEditAutor').value.trim();
+  if(!titulo){ toast('El título no puede estar vacío.'); return; }
+  const o = state.obras.find(x=>x.id===id);
+  o.titulo = titulo; o.autor = autor || null;
+  closeModal(); navigate('partiturasdirector'); toast('Obra actualizada ✅','gold');
+}
+function eliminarObra(id){
+  openModal(`<h3>Eliminar obra</h3>
+    <p class="meta">Se eliminará la obra y todas sus particellas. Esta acción no se puede deshacer.</p>
+    <div style="display:flex; gap:8px; margin-top:16px;">
+      <button class="btn-sm solid" onclick="confirmarEliminarObra('${id}')">Sí, eliminar</button>
+      <button class="btn-sm" onclick="closeModal()">Cancelar</button>
+    </div>`);
+}
+function confirmarEliminarObra(id){
+  state.obras = state.obras.filter(o=>o.id!==id);
+  state.eventos.forEach(e=>{ if(e.repertorio) e.repertorio = e.repertorio.filter(oid=>oid!==id); });
+  partiturasUI.obra = null;
+  closeModal(); navigate('partiturasdirector'); toast('Obra eliminada.');
+}
+
+/* ---- Añadir particella a una obra (un archivo único por cuerda/voz) ---- */
+let archivoPendienteParticella = null;
+function formAnadirParticella(obraId){
+  archivoPendienteParticella = null;
+  return `<h3>Añadir particella</h3>
+  <input type="hidden" id="paObraId" value="${obraId}">
   <div class="field"><label>Cuerda</label>
-    <select id="subCuerda">${cuerdasAsignables().map(c=>`<option value="${c}" ${partiturasUI.cuerda===c?'selected':''}>${c}</option>`).join('')}</select>
+    <select id="paCuerda">${cuerdasAsignables().map(c=>`<option value="${c}">${c}</option>`).join('')}</select>
   </div>
-  <div id="subCamposTitAutor">
-    <div class="field"><label>Título</label><input id="subTitulo" placeholder="Ej: Amarguras"></div>
-    <div class="field"><label>Autor</label><input id="subAutor" placeholder="Ej: Antonio Ferrer"></div>
-  </div>
+  <div class="field"><label>Voz (opcional)</label><input id="paVoz" placeholder="Ej: Saxofón 1 — déjalo en blanco si el archivo incluye todas las voces"></div>
   <div class="field">
-    <label>Archivo(s) PDF</label>
-    <input type="file" id="subArchivo" accept="application/pdf,.pdf" multiple style="display:none" onchange="onArchivoPartituraSeleccionado(this)">
-    <div id="subDropzone" class="dropzone-pdf"
-      ondragover="onDragOverPartitura(event)" ondragleave="onDragLeavePartitura(event)" ondrop="onDropPartitura(event)">
-      <button type="button" class="btn-sm solid ocean" onclick="document.getElementById('subArchivo').click()">📎 Subir Archivo(s)</button>
-      <p class="meta" style="margin-top:8px;">o arrastra aquí uno o varios PDF</p>
-      <div id="subArchivoLista" style="margin-top:8px;"><span class="meta">Ningún archivo seleccionado.</span></div>
+    <label>Archivo PDF</label>
+    <input type="file" id="paArchivo" accept="application/pdf,.pdf" style="display:none" onchange="onArchivoParticellaSeleccionado(this)">
+    <div id="paDropzone" class="dropzone-pdf"
+      ondragover="onDragOverParticella(event)" ondragleave="onDragLeaveParticella(event)" ondrop="onDropParticella(event)">
+      <button type="button" class="btn-sm solid ocean" onclick="document.getElementById('paArchivo').click()">📎 Subir Archivo</button>
+      <p class="meta" style="margin-top:8px;">o arrastra aquí tu PDF</p>
+      <div id="paArchivoLista" style="margin-top:8px;"><span class="meta">Ningún archivo seleccionado.</span></div>
     </div>
   </div>
-  <p class="meta" id="subAyuda" style="margin:-4px 0 10px; display:none;">Al subir varios archivos, el título de cada uno será el nombre del PDF. Podrás editar título y autor después, desde el botón "Editar" de cada partitura.</p>
-  <button class="btn-primary" onclick="subirPartitura()">Subir</button>`;
+  <button class="btn-primary" onclick="subirParticella()">Subir</button>`;
 }
-
-function agregarArchivosPartitura(fileList){
-  Array.from(fileList).forEach(file=>{
-    if(file.type!=='application/pdf' && !file.name.toLowerCase().endsWith('.pdf')){
-      toast(`"${file.name}" no es un PDF y se ha omitido.`);
-      return;
-    }
-    archivosPendientesPartitura.push({id:'f'+Date.now()+Math.random().toString(36).slice(2), file});
-  });
-  renderListaArchivosPendientes();
+function establecerArchivoParticella(file){
+  if(!file) return;
+  if(file.type!=='application/pdf' && !file.name.toLowerCase().endsWith('.pdf')){
+    toast(`"${file.name}" no es un PDF.`);
+    return;
+  }
+  archivoPendienteParticella = file;
+  renderArchivoParticellaSeleccionado();
 }
-function renderListaArchivosPendientes(){
-  const cont = document.getElementById('subArchivoLista');
-  const camposWrap = document.getElementById('subCamposTitAutor');
-  const ayuda = document.getElementById('subAyuda');
+function renderArchivoParticellaSeleccionado(){
+  const cont = document.getElementById('paArchivoLista');
   if(!cont) return;
-  const multiple = archivosPendientesPartitura.length > 1;
-  if(camposWrap) camposWrap.style.display = multiple ? 'none' : 'block';
-  if(ayuda) ayuda.style.display = multiple ? 'block' : 'none';
-
-  if(!archivosPendientesPartitura.length){
-    cont.innerHTML = '<span class="meta">Ningún archivo seleccionado.</span>';
-    return;
-  }
-  if(!multiple){
-    const a = archivosPendientesPartitura[0];
-    cont.innerHTML = `<span class="file-selected-chip">📄 ${a.file.name} <button type="button" onclick="quitarArchivoPendiente('${a.id}')">✕</button></span>`;
-    return;
-  }
-  cont.innerHTML = `
-    <div class="file-list-scroll">
-      ${archivosPendientesPartitura.map(a=>`
-        <div class="file-list-row">
-          <span>📄 ${a.file.name}</span>
-          <button type="button" onclick="quitarArchivoPendiente('${a.id}')">✕</button>
-        </div>`).join('')}
-    </div>
-    <p class="meta" style="margin-top:6px;">${archivosPendientesPartitura.length} archivos listos para subir</p>`;
+  cont.innerHTML = archivoPendienteParticella
+    ? `<span class="file-selected-chip">📄 ${archivoPendienteParticella.name} <button type="button" onclick="quitarArchivoParticellaPendiente()">✕</button></span>`
+    : '<span class="meta">Ningún archivo seleccionado.</span>';
 }
-function quitarArchivoPendiente(id){
-  archivosPendientesPartitura = archivosPendientesPartitura.filter(x=>x.id!==id);
-  renderListaArchivosPendientes();
+function quitarArchivoParticellaPendiente(){
+  archivoPendienteParticella = null;
+  renderArchivoParticellaSeleccionado();
 }
-function onArchivoPartituraSeleccionado(input){
-  agregarArchivosPartitura(input.files);
-  input.value = '';
-}
-function onDragOverPartitura(e){ e.preventDefault(); document.getElementById('subDropzone').classList.add('drag-over'); }
-function onDragLeavePartitura(e){ document.getElementById('subDropzone').classList.remove('drag-over'); }
-function onDropPartitura(e){
+function onArchivoParticellaSeleccionado(input){ establecerArchivoParticella(input.files[0]); input.value=''; }
+function onDragOverParticella(e){ e.preventDefault(); document.getElementById('paDropzone').classList.add('drag-over'); }
+function onDragLeaveParticella(e){ document.getElementById('paDropzone').classList.remove('drag-over'); }
+function onDropParticella(e){
   e.preventDefault();
-  document.getElementById('subDropzone').classList.remove('drag-over');
-  if(e.dataTransfer.files.length) agregarArchivosPartitura(e.dataTransfer.files);
+  document.getElementById('paDropzone').classList.remove('drag-over');
+  if(e.dataTransfer.files.length) establecerArchivoParticella(e.dataTransfer.files[0]);
+}
+function subirParticella(){
+  const obraId = document.getElementById('paObraId').value;
+  const obra = state.obras.find(o=>o.id===obraId);
+  const cuerda = document.getElementById('paCuerda').value;
+  const voz = document.getElementById('paVoz').value.trim() || null;
+  if(!obra){ toast('No se encuentra la obra.'); return; }
+  if(!archivoPendienteParticella){ toast('Selecciona un archivo PDF.'); return; }
+
+  const reader = new FileReader();
+  reader.onload = (ev)=>{
+    obra.particellas.push({
+      id:'pa'+Date.now()+Math.random().toString(36).slice(2), cuerda, voz,
+      nombreArchivo:archivoPendienteParticella.name, fecha:Date.now(), archivo:ev.target.result
+    });
+    archivoPendienteParticella = null;
+    closeModal();
+    navigate('partiturasdirector');
+    toast('Particella añadida ✅','gold');
+  };
+  reader.readAsDataURL(archivoPendienteParticella);
+}
+function eliminarParticella(obraId, particellaId){
+  openModal(`<h3>Eliminar particella</h3>
+    <p class="meta">Esta acción no se puede deshacer. ¿Confirmas la eliminación?</p>
+    <div style="display:flex; gap:8px; margin-top:16px;">
+      <button class="btn-sm solid" onclick="confirmarEliminarParticella('${obraId}','${particellaId}')">Sí, eliminar</button>
+      <button class="btn-sm" onclick="closeModal()">Cancelar</button>
+    </div>`);
+}
+function confirmarEliminarParticella(obraId, particellaId){
+  const obra = state.obras.find(o=>o.id===obraId);
+  if(obra) obra.particellas = obra.particellas.filter(pa=>pa.id!==particellaId);
+  closeModal();
+  navigate('partiturasdirector');
+  toast('Particella eliminada.');
 }
 
-function subirPartitura(){
-  const categoria = document.getElementById('subCategoria').value;
-  const cuerda = document.getElementById('subCuerda').value;
-  if(!archivosPendientesPartitura.length){ toast('Selecciona al menos un archivo PDF.'); return; }
-
-  const multiple = archivosPendientesPartitura.length > 1;
-  let titulo, autor;
-  if(!multiple){
-    titulo = document.getElementById('subTitulo').value.trim();
-    autor = document.getElementById('subAutor').value.trim();
-    if(!titulo || !autor){ toast('Indica título y autor.'); return; }
-  }
-
-  let restantes = archivosPendientesPartitura.length;
-  const totalSubidos = restantes;
-  archivosPendientesPartitura.forEach(a=>{
-    const reader = new FileReader();
-    reader.onload = (ev)=>{
-      state.partituras.push({
-        id:'p'+Date.now()+Math.random().toString(36).slice(2), categoria, cuerda,
-        titulo: multiple ? a.file.name.replace(/\.pdf$/i,'') : titulo,
-        autor: multiple ? null : autor,
-        nombreArchivo:a.file.name,
-        fecha:Date.now(), subidoPor:state.currentUser.name, archivo:ev.target.result
-      });
-      restantes--;
-      if(restantes===0){
-        partiturasUI.categoria = categoria; partiturasUI.cuerda = cuerda;
-        archivosPendientesPartitura = [];
-        closeModal();
-        navigate('partiturasdirector');
-        toast(multiple ? `${totalSubidos} partituras subidas ✅` : 'Partitura subida ✅','gold');
-      }
-    };
-    reader.readAsDataURL(a.file);
-  });
-}
-
-/* ---- Visor de PDF por páginas ---- */
+/* ---- Visor de PDF por páginas (genérico, reutilizado por particellas) ---- */
 let pdfViewerState = { doc:null, pageNum:1, numPages:1, rendering:false };
 
-async function abrirVisorPDF(id){
-  const p = state.partituras.find(x=>x.id===id);
-  if(!p || !p.archivo){ toast('No hay archivo disponible para previsualizar.'); return; }
+async function abrirVisorPDFParticella(obraId, particellaId){
+  const obra = state.obras.find(o=>o.id===obraId);
+  const pa = obra && obra.particellas.find(x=>x.id===particellaId);
+  if(!pa || !pa.archivo){ toast('No hay archivo disponible para previsualizar.'); return; }
+  const titulo = obra.titulo + (obra.autor?' de '+obra.autor:'') + (pa.voz?' — '+pa.voz:'');
+  await _abrirVisorPDFConDatos(titulo, pa.archivo);
+}
+async function _abrirVisorPDFConDatos(titulo, dataUrl){
   if(!window.pdfjsLib){ toast('No se pudo cargar el visor de PDF.'); return; }
-  document.getElementById('pdfViewerTitle').textContent = p.titulo + (p.autor? ' de '+p.autor:'');
+  document.getElementById('pdfViewerTitle').textContent = titulo;
   document.getElementById('pdfPageIndicator').textContent = 'Cargando…';
   document.getElementById('pdfViewerBg').classList.add('show');
   try{
-    const pdf = await pdfjsLib.getDocument(p.archivo).promise;
+    const pdf = await pdfjsLib.getDocument(dataUrl).promise;
     pdfViewerState.doc = pdf;
     pdfViewerState.numPages = pdf.numPages;
     pdfViewerState.pageNum = 1;
@@ -2818,37 +2949,98 @@ document.addEventListener('keydown', e=>{
 });
 window.addEventListener('resize', ()=>{ if(document.getElementById('pdfViewerBg').classList.contains('show')) renderizarPaginaPDF(); });
 
-function formEditarPartitura(id){
-  const p = state.partituras.find(x=>x.id===id);
-  if(!p) return '';
-  return `<h3>Editar partitura</h3>
-  <div class="field"><label>Título</label><input id="editTitulo" value="${p.titulo}"></div>
-  <div class="field"><label>Autor</label><input id="editAutor" value="${p.autor||''}" placeholder="Ej: Antonio Ferrer"></div>
-  <button class="btn-primary" onclick="guardarEdicionPartitura('${id}')">Guardar cambios</button>`;
+/* ---- Repertorio de una actuación (Director gestiona, Músico consulta/descarga) ---- */
+function formRepertorio(eventoId){
+  const evento = state.eventos.find(e=>e.id===eventoId);
+  const seleccion = new Set(evento.repertorio||[]);
+  const hayObras = state.obras.length>0;
+  return `<h3>Repertorio: ${evento.nombre}</h3>
+  <p class="meta" style="margin-bottom:10px;">Selecciona las obras que se van a interpretar.</p>
+  <div style="max-height:320px; overflow-y:auto;">
+    ${hayObras ? CATEGORIAS_PARTITURAS.map(cat=>{
+      const obras = state.obras.filter(o=>o.categoria===cat.key);
+      if(!obras.length) return '';
+      return `
+      <p class="meta" style="font-weight:700; margin:10px 0 4px;">${cat.emoji} ${cat.label}</p>
+      ${obras.map(o=>`
+        <label style="display:flex; align-items:center; gap:8px; padding:6px 0; font-size:13.5px;">
+          <input type="checkbox" class="repertorio-check" value="${o.id}" ${seleccion.has(o.id)?'checked':''}>
+          ${o.titulo}${o.autor?` de ${o.autor}`:''}
+        </label>`).join('')}`;
+    }).join('') : '<p class="meta">Aún no hay obras subidas en Partituras.</p>'}
+  </div>
+  <button class="btn-primary" style="margin-top:14px;" onclick="guardarRepertorio('${eventoId}')">Guardar repertorio</button>`;
 }
-function guardarEdicionPartitura(id){
-  const titulo = document.getElementById('editTitulo').value.trim();
-  const autor = document.getElementById('editAutor').value.trim();
-  if(!titulo){ toast('El título no puede estar vacío.'); return; }
-  const p = state.partituras.find(x=>x.id===id);
-  p.titulo = titulo; p.autor = autor || null;
+function guardarRepertorio(eventoId){
+  const evento = state.eventos.find(e=>e.id===eventoId);
+  evento.repertorio = Array.from(document.querySelectorAll('.repertorio-check:checked')).map(c=>c.value);
   closeModal();
   navigate(currentSection);
-  toast('Partitura actualizada ✅','gold');
+  toast('Repertorio actualizado ✅','gold');
 }
-function eliminarPartitura(id){
-  openModal(`<h3>Eliminar partitura</h3>
-    <p class="meta">Esta acción no se puede deshacer. ¿Confirmas la eliminación?</p>
-    <div style="display:flex; gap:8px; margin-top:16px;">
-      <button class="btn-sm solid" onclick="confirmarEliminarPartitura('${id}')">Sí, eliminar</button>
-      <button class="btn-sm" onclick="closeModal()">Cancelar</button>
-    </div>`);
+
+function verRepertorio(eventoId){
+  const evento = state.eventos.find(e=>e.id===eventoId);
+  const obras = state.obras.filter(o=>(evento.repertorio||[]).includes(o.id));
+  openModal(`<h3>Repertorio: ${evento.nombre}</h3>
+  ${obras.length? obras.map(o=>`<div class="list-item" style="border:none; padding:8px 0;">🎼 ${o.titulo}${o.autor?` de ${o.autor}`:''}</div>`).join('') : '<p class="meta">Aún no hay repertorio definido para esta actuación.</p>'}
+  `);
 }
-function confirmarEliminarPartitura(id){
-  state.partituras = state.partituras.filter(p=>p.id!==id);
+
+let repertorioDescargaPendiente = { partes:[], nombreEvento:'' };
+function descargarRepertorio(eventoId){
+  const evento = state.eventos.find(e=>e.id===eventoId);
+  const obras = state.obras.filter(o=>(evento.repertorio||[]).includes(o.id));
+  if(!obras.length){ toast('Este repertorio no tiene obras todavía.'); return; }
+  const miCuerda = state.currentUser.cuerda;
+  const partes = [];
+  obras.forEach(o=> o.particellas.filter(pa=>pa.cuerda===miCuerda).forEach(pa=> partes.push({...pa, obraTitulo:o.titulo})));
+  if(!partes.length){ toast('No hay partituras de tu cuerda para este repertorio.'); return; }
+
+  const voces = Array.from(new Set(partes.filter(p=>p.voz).map(p=>p.voz)));
+  const hayGeneral = partes.some(p=>!p.voz);
+  if(voces.length){
+    repertorioDescargaPendiente = { partes, nombreEvento: evento.nombre };
+    openModal(`<h3>Selecciona tu voz</h3>
+    <p class="meta" style="margin-bottom:10px;">Hay varias voces disponibles para tu cuerda en este repertorio.</p>
+    <div class="field"><label>Voz</label>
+      <select id="selVozRepertorio">
+        ${hayGeneral?'<option value="__general__">Todas las voces (archivo general)</option>':''}
+        ${voces.map(v=>`<option value="${v}">${v}</option>`).join('')}
+      </select>
+    </div>
+    <button class="btn-primary" onclick="confirmarDescargaVozRepertorio()">Descargar ZIP</button>`);
+  } else {
+    generarZipRepertorio(partes, evento.nombre);
+  }
+}
+function confirmarDescargaVozRepertorio(){
+  const voz = document.getElementById('selVozRepertorio').value;
+  const { partes, nombreEvento } = repertorioDescargaPendiente;
+  const filtradas = voz==='__general__' ? partes.filter(p=>!p.voz) : partes.filter(p=>p.voz===voz);
   closeModal();
-  navigate(currentSection);
-  toast('Partitura eliminada.');
+  generarZipRepertorio(filtradas, nombreEvento);
+}
+function sanitizeNombreArchivo(s){ return (s||'').replace(/[\\/:*?"<>|]/g,'-'); }
+function generarZipRepertorio(partes, nombreEvento){
+  const conArchivo = partes.filter(p=>p.archivo);
+  if(!conArchivo.length){ toast('Los archivos de esta selección son solo de muestra y no se pueden descargar.'); return; }
+  if(!window.JSZip){ toast('No se pudo cargar el generador de ZIP.'); return; }
+  toast('Generando ZIP…','ocean');
+  const zip = new JSZip();
+  conArchivo.forEach(p=>{
+    const base64 = p.archivo.split(',')[1];
+    const nombre = `${sanitizeNombreArchivo(p.obraTitulo)}${p.voz? ' - '+sanitizeNombreArchivo(p.voz):''}.pdf`;
+    zip.file(nombre, base64, {base64:true});
+  });
+  zip.generateAsync({type:'blob'}).then(blob=>{
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `Repertorio - ${sanitizeNombreArchivo(nombreEvento)}.zip`;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 3000);
+    toast('Repertorio descargado ✅','gold');
+  }).catch(()=> toast('No se pudo generar el ZIP.'));
 }
 
 RENDER.cuerdas = ()=>`
